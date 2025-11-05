@@ -30,7 +30,7 @@ set ( SOURCE_ONE_WEEKEND
 #   src/InOneWeekend/ray.h
 #   src/InOneWeekend/rtweekend.h
 #   src/InOneWeekend/sphere.h
-#   src/InOneWeekend/vec3.h
+  src/InOneWeekend/vec3.h
 )
 
 set ( SOURCE_NEXT_WEEK
