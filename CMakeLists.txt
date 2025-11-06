@@ -25,7 +25,7 @@ set ( SOURCE_ONE_WEEKEND
   src/InOneWeekend/color.h
   src/InOneWeekend/hittable.h
   src/InOneWeekend/hittableList.h
-#   src/InOneWeekend/interval.h
+  src/InOneWeekend/interval.h
 #   src/InOneWeekend/material.h
   src/InOneWeekend/ray.h
   src/InOneWeekend/rtweekend.h
