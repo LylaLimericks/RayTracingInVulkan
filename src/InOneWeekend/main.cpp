@@ -1,4 +1,5 @@
 #include "rtweekend.h"
+#include "interval.h"
 #include "color.h"
 #include "ray.h"
 #include "vec3.h"
@@ -10,7 +11,7 @@
 
 color rayColor(const ray& r, const hittable& world) {
     hitRecord rec;
-    if (world.hit(r, 0, infinity, rec)){
+    if (world.hit(r, interval(0, infinity), rec)){
         return 0.5 * (rec.normal + color(1,1,1));
     }
     
