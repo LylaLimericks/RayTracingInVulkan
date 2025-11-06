@@ -1,0 +1,37 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "cmake build",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build/"
+            ],
+            "problemMatcher": [],
+        },
+        {
+            "label": "Generate Image",
+            "type": "shell",
+            "command": "./build/inOneWeekend",
+            "args": [
+                ">",
+                "image.ppm"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "View image",
+            "type": "shell",
+            "command": "eog",
+            "args": [
+                "${workspaceRoot}/image.ppm"
+            ],
+            "problemMatcher": [],
+        }
+    ]
+}
