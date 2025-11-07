@@ -126,6 +126,18 @@ inline vec3 unitVector(const vec3 &v)
     return v / v.length();
 }
 
+inline vec3 randomInUnitDisk()
+{
+    while (true)
+    {
+        auto p = vec3(randomDouble(-1, 1), randomDouble(-1, 1), 0);
+        if (p.lengthSquared() < 1)
+        { // TODO: I think we can adjust this to not burn a square
+            return p;
+        }
+    }
+}
+
 inline vec3 randomUnitVector()
 {
     while (true)
