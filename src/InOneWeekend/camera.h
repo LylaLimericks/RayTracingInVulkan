@@ -48,11 +48,11 @@ public:
 private:
     int imageHeight;
     double pixelSamplesScale; // Color scale factor for a sum of pixel samples
-    point3 center;
-    point3 pixel00Loc;
-    vec3 pixelDeltaU;
-    vec3 pixelDeltaV;
-    vec3 u, v, w; // Camera frame basis vectors
+    point3 center;            // Camera center TODO: Remove?
+    point3 pixel00Loc;        // Location of pixel 0, 0
+    vec3 pixelDeltaU;         // Offset per pixel from left to right
+    vec3 pixelDeltaV;         // Offset per pixel from top to bottom
+    vec3 u, v, w;             // Camera frame basis vectors
 
     void initialize()
     {
