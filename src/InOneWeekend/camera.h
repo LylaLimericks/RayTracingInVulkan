@@ -13,7 +13,10 @@ public:
     int samplesPerPixel = 10; // Count of random samples for each pixel
     int maxDepth = 10;        // Maximum number of ray bounces in the scene
 
-    double vFov = 90; // Vertical view angle (field of view)
+    double vFov = 90;                  // Vertical view angle (field of view)
+    point3 lookFrom = point3(0, 0, 0); // Origin of the camera
+    point3 lookAt = point3(0, 0, -1);  // Camera target
+    point3 vUp = vec3(0, 1, 0);        // Vertical ortho of view direction (camera up)
 
     void render(const hittable &world)
     {
@@ -49,6 +52,7 @@ private:
     point3 pixel00Loc;
     vec3 pixelDeltaU;
     vec3 pixelDeltaV;
+    vec3 u, v, w; // Camera frame basis vectors
 
     void initialize()
     {
@@ -57,26 +61,30 @@ private:
 
         pixelSamplesScale = 1.0 / samplesPerPixel;
 
-        center = point3(0, 0, 0);
+        center = lookFrom;
 
         // Calculate viewport dimensions
-        auto focalLength = 1.0;
+        auto focalLength = (lookFrom - lookAt).length();
         auto theta = degreesToRadians(vFov);
         auto h = std::tan(theta / 2);
         auto viewportHeight = 2 * h * focalLength;
         auto viewportWidth = viewportHeight * (double(imageWidth) / imageHeight);
-        auto cameraCenter = point3(0, 0, 0);
+
+        // Calculate the u,v,w unit basis vectors for the camera coordinate frame.
+        w = unitVector(lookFrom - lookAt);
+        u = unitVector(cross(vUp, w));
+        v = cross(w, u);
 
         // Calculate vectors along and down the viewport
-        auto viewportU = vec3(viewportWidth, 0, 0);
-        auto viewportV = vec3(0, -viewportHeight, 0);
+        auto viewportU = viewportWidth * u;   // Vector along horizontal edge
+        auto viewportV = viewportHeight * -v; // Vector down viewport vertical edge
 
         // Determine delta for mapping pixels onto viewport
         pixelDeltaU = viewportU / imageWidth;
         pixelDeltaV = viewportV / imageHeight;
 
         // Calculate upper left pixel location
-        auto viewportUpperLeft = cameraCenter - vec3(0, 0, focalLength) - viewportU / 2 - viewportV / 2;
+        auto viewportUpperLeft = center - (focalLength * w) - viewportU / 2 - viewportV / 2;
         pixel00Loc = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
     }
 
