@@ -5,30 +5,30 @@
 
 #include <iostream>
 
-color rayColor(const ray& r, const hittable& world) {
+color rayColor(const ray &r, const hittable &world)
+{
 }
 
-int main() {
+int main()
+{
     hittableList world;
 
-    auto materialGround = make_shared<lambertian>(color(0.8, 0.8, 0.0));
-    auto materialCenter = make_shared<lambertian>(color(0.1, 0.2, 0.5));
-    auto materialLeft = make_shared<dielectric>(1.33);
-    auto materialBubble = make_shared<dielectric>(1.0 / 1.5);
-    auto materialRight = make_shared<metal>(color(0.8, 0.6, 0.2), 1.0);
+    auto R = std::cos(pi / 4);
 
-    world.add(make_shared<sphere>(point3( 0.0, -100.5, -1.0), 100.0, materialGround));
-    world.add(make_shared<sphere>(point3( 0.0,    0.0, -1.2),   0.5, materialCenter));
-    world.add(make_shared<sphere>(point3(-1.0,    0.0, -1.0),   0.5, materialLeft));
-    world.add(make_shared<sphere>(point3(-1.0,    0.0, -1.0),   0.4, materialBubble));
-    world.add(make_shared<sphere>(point3( 1.0,    0.0, -1.0),   0.5, materialRight));
+    auto material_left = make_shared<lambertian>(color(0, 0, 1));
+    auto material_right = make_shared<lambertian>(color(1, 0, 0));
+
+    world.add(make_shared<sphere>(point3(-R, 0, -1), R, material_left));
+    world.add(make_shared<sphere>(point3(R, 0, -1), R, material_right));
 
     camera cam;
-    
+
     cam.aspectRatio = 16.0 / 9.0;
     cam.imageWidth = 400;
     cam.samplesPerPixel = 100;
     cam.maxDepth = 50;
+
+    cam.vFov = 90;
 
     cam.render(world);
 
