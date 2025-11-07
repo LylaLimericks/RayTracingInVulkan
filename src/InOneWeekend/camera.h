@@ -1,8 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "hittable.h"
 #include "color.h"
+#include "hittable.h"
 
 class camera
 {

@@ -1,8 +1,7 @@
-#include "rtweekend.h"
-#include "vec3.h"
+#include "camera.h"
 #include "hittableList.h"
 #include "sphere.h"
-#include "camera.h"
+#include "vec3.h"
 
 #include <iostream>
 

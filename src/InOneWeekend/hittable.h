@@ -1,8 +1,8 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "ray.h"
 #include "interval.h"
+#include "ray.h"
 
 class material;
 

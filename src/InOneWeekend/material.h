@@ -1,8 +1,8 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "hittable.h"
 #include "color.h"
+#include "hittable.h"
 #include "ray.h"
 
 class material {
