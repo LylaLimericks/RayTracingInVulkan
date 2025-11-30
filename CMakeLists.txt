@@ -13,7 +13,7 @@ add_library(Vulkan::cppm ALIAS VulkanCppModule)
 
 target_compile_definitions(VulkanCppModule INTERFACE
   VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
-  VULKAN_HPP_NO_STRUCT_CONSTRUCTORS=0
+  VULKAN_HPP_NO_STRUCT_CONSTRUCTORS=1
 )
 
 add_library(Application)
@@ -32,6 +32,7 @@ target_sources(Application
 )
 
 target_compile_features(Application PRIVATE cxx_std_20)
+target_compile_definitions(Application PRIVATE VULKAN_HPP_NO_STRUCT_CONSTRUCTORS)
 
 # add_library(VulkanRT)
 

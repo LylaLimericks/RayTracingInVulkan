@@ -1,4 +1,3 @@
-#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
 #include "RayTracingApplication.hpp"
 #include "vulkan/vulkan.hpp"
 #include <iostream>
