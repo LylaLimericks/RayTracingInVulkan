@@ -2,8 +2,11 @@
 #define RAY_TRACING_APPLICATION_H
 
 #include "WindowManager.hpp"
+#include <iostream>
 #include <memory>
+#include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_raii.hpp>
+#include <vulkan/vulkan_to_string.hpp>
 
 namespace RayTracing {
 
@@ -33,10 +36,22 @@ private:
 
   WindowManager windowManager;
   std::unique_ptr<vk::raii::Instance> instance;
+  std::unique_ptr<vk::raii::DebugUtilsMessengerEXT> debugMessenger;
   vk::raii::Context context;
 
   void createInstance();
   std::vector<const char *> getRequiredExtensions();
+  void setupDebugMessenger();
+
+  static VKAPI_ATTR vk::Bool32 VKAPI_CALL debugCallback(
+      vk::DebugUtilsMessageSeverityFlagBitsEXT severity,
+      vk::DebugUtilsMessageTypeFlagsEXT type,
+      const vk::DebugUtilsMessengerCallbackDataEXT *pCallbackData, void *) {
+    std::cerr << "validation layer: type " << vk::to_string(type)
+              << " msg: " << pCallbackData->pMessage << std::endl;
+
+    return vk::False;
+  }
 };
 
 } // namespace RayTracing

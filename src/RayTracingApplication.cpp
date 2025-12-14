@@ -1,8 +1,10 @@
 #include "RayTracingApplication.hpp"
 #include "vulkan/vulkan.hpp"
 #include <iostream>
+#include <memory>
 #include <ostream>
 #include <stdexcept>
+#include <vulkan/vulkan_raii.hpp>
 
 namespace RayTracing {
 
@@ -16,7 +18,10 @@ void RayTracingApplication::assignWindowManager(WindowManager &winManager) {
   windowManager = winManager;
 }
 
-void RayTracingApplication::initVulkan() { createInstance(); }
+void RayTracingApplication::initVulkan() {
+  createInstance();
+  setupDebugMessenger();
+}
 
 void RayTracingApplication::createInstance() {
   constexpr vk::ApplicationInfo appInfo{
@@ -26,11 +31,14 @@ void RayTracingApplication::createInstance() {
       .apiVersion = vk::ApiVersion14,
   };
 
+  // Retrieve the list of required layers
   std::vector<char const *> requiredLayers;
   if (enableValidationLayers) {
     requiredLayers.assign(validationLayers.begin(), validationLayers.end());
   }
 
+  // Ensure that the required layers are supported by the current Vulkan
+  // implementation
   auto layerProperties = context.enumerateInstanceLayerProperties();
   if (std::ranges::any_of(
           requiredLayers, [&layerProperties](auto const &requiredLayer) {
@@ -43,10 +51,12 @@ void RayTracingApplication::createInstance() {
         "One or more required Vulkan layers not supported!");
   }
 
+  // Get the list of required Extensions
   auto extensions = getRequiredExtensions();
 
+  // Ensure that the required extensions are supported by the Vulkan
+  // implementation
   auto extensionProperties = context.enumerateInstanceExtensionProperties();
-
   for (const auto &extension : extensions) {
     if (std::ranges::none_of(
             extensionProperties, [extension](auto const &extensionProperty) {
@@ -79,6 +89,28 @@ std::vector<const char *> RayTracingApplication::getRequiredExtensions() {
   }
 
   return extensions;
+}
+
+void RayTracingApplication::setupDebugMessenger() {
+  if (!enableValidationLayers)
+    return;
+
+  vk::DebugUtilsMessageSeverityFlagsEXT severityFlags(
+      vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
+      vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+      vk::DebugUtilsMessageSeverityFlagBitsEXT::eError);
+  vk::DebugUtilsMessageTypeFlagsEXT messageTypeFlags(
+      vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+      vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance |
+      vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation);
+  vk::DebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfoEXT{
+      .messageSeverity = severityFlags,
+      .messageType = messageTypeFlags,
+      .pfnUserCallback = &RayTracingApplication::debugCallback,
+  };
+
+  debugMessenger = std::make_unique<vk::raii::DebugUtilsMessengerEXT>(
+      instance->createDebugUtilsMessengerEXT(debugUtilsMessengerCreateInfoEXT));
 }
 
 void RayTracingApplication::mainLoop() {
