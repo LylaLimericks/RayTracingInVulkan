@@ -3,9 +3,13 @@
 
 #include <cstdint>
 
+namespace RayTracing {
+
 class WindowManager {
 public:
   const char **getRequiredExtensions(uint32_t &extensionCount);
 };
+
+} // namespace RayTracing
 
 #endif

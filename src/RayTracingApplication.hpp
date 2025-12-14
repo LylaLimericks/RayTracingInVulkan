@@ -5,6 +5,8 @@
 #include <memory>
 #include <vulkan/vulkan_raii.hpp>
 
+namespace RayTracing {
+
 #ifdef NDEBUG
 constexpr bool enableValidationLayers = false;
 #else
@@ -36,4 +38,5 @@ private:
   void createInstance();
 };
 
+} // namespace RayTracing
 #endif

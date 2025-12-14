@@ -4,6 +4,8 @@
 #include <ostream>
 #include <stdexcept>
 
+namespace RayTracing {
+
 void RayTracingApplication::run() { initVulkan(); }
 
 void RayTracingApplication::assignWindowManager(WindowManager &winManager) {
@@ -69,3 +71,5 @@ void RayTracingApplication::mainLoop() {
 void RayTracingApplication::cleanup() {
   std::cout << "Cleaning Up..." << std::endl;
 }
+
+} // namespace RayTracing
