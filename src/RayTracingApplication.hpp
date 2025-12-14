@@ -14,6 +14,10 @@ const std::vector<char const *> validationLayers = {
     "VK_LAYER_KHRONOS_validation",
 };
 
+// TODO: Refactor these to no longer be compile time constants.
+constexpr uint32_t WIDTH = 800;
+constexpr uint32_t HEIGHT = 600;
+
 class RayTracingApplication {
 public:
   void run();
