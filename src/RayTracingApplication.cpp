@@ -43,7 +43,11 @@ void RayTracingApplication::createInstance() {
 
   vk::InstanceCreateInfo createInfo{
       .pApplicationInfo = &appInfo,
+      .enabledExtensionCount = extensionCount,
+      .ppEnabledExtensionNames = extensions,
   };
+
+  instance = vk::raii::Instance(context, createInfo);
 }
 
 void RayTracingApplication::mainLoop() {
