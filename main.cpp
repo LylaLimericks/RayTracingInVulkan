@@ -1,8 +1,16 @@
 #include "RayTracingApplication.hpp"
+#include <cstdlib>
+#include <exception>
+#include <iostream>
 
 int main() {
-  RayTracing::RayTracingApplication app;
-  app.run();
+  try {
+    RayTracing::RayTracingApplication app;
+    app.run();
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
+    return EXIT_FAILURE;
+  }
 
-  return 0;
+  return EXIT_SUCCESS;
 }
