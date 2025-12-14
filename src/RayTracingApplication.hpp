@@ -36,6 +36,7 @@ private:
   vk::raii::Context context;
 
   void createInstance();
+  std::vector<const char *> getRequiredExtensions();
 };
 
 } // namespace RayTracing

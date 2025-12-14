@@ -6,7 +6,11 @@
 
 namespace RayTracing {
 
-void RayTracingApplication::run() { initVulkan(); }
+void RayTracingApplication::run() {
+  initVulkan();
+  mainLoop();
+  cleanup();
+}
 
 void RayTracingApplication::assignWindowManager(WindowManager &winManager) {
   windowManager = winManager;
@@ -39,32 +43,47 @@ void RayTracingApplication::createInstance() {
         "One or more required Vulkan layers not supported!");
   }
 
-  uint32_t extensionCount = 0;
-  auto extensions = windowManager.getRequiredExtensions(extensionCount);
+  auto extensions = getRequiredExtensions();
 
   auto extensionProperties = context.enumerateInstanceExtensionProperties();
 
-  for (uint32_t i = 0; i < extensionCount; ++i) {
+  for (const auto &extension : extensions) {
     if (std::ranges::none_of(
-            extensionProperties,
-            [extension = extensions[i]](auto const &extensionProperty) {
+            extensionProperties, [extension](auto const &extensionProperty) {
               return strcmp(extensionProperty.extensionName, extension) == 0;
             })) {
       throw std::runtime_error("Required extension not supported: " +
-                               std::string(extensions[i]));
+                               std::string(extension));
     }
   }
 
   vk::InstanceCreateInfo createInfo{
       .pApplicationInfo = &appInfo,
-      .enabledExtensionCount = extensionCount,
-      .ppEnabledExtensionNames = extensions,
+      .enabledLayerCount = static_cast<uint32_t>(requiredLayers.size()),
+      .ppEnabledLayerNames = requiredLayers.data(),
+      .enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
+      .ppEnabledExtensionNames = extensions.data(),
   };
 
   instance = std::make_unique<vk::raii::Instance>(context, createInfo);
 }
 
+std::vector<const char *> RayTracingApplication::getRequiredExtensions() {
+  uint32_t extensionCount = 0;
+  auto winExtensions = windowManager.getRequiredExtensions(extensionCount);
+
+  std::vector extensions(winExtensions, winExtensions + extensionCount);
+
+  if (enableValidationLayers) {
+    extensions.push_back(vk::EXTDebugUtilsExtensionName);
+  }
+
+  return extensions;
+}
+
 void RayTracingApplication::mainLoop() {
+  while (true)
+    ;
   std::cout << "Running the main loop..." << std::endl;
 }
 
