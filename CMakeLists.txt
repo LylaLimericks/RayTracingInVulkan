@@ -21,6 +21,7 @@ add_library(Application)
 target_sources(Application
   PRIVATE
     src/RayTracingApplication.cpp
+    src/WindowManager.cpp
 
   PUBLIC
     FILE_SET applicationHeaders
@@ -29,6 +30,7 @@ target_sources(Application
       src
     FILES
       src/RayTracingApplication.hpp
+      src/WindowManager.hpp
 )
 
 target_compile_features(Application PRIVATE cxx_std_20)
@@ -64,6 +66,7 @@ target_link_libraries(RayTracer
   PRIVATE
     Vulkan::cppm
     Application
+    glfw
     # VulkanRT
 )
 

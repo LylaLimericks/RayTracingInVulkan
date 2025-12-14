@@ -4,18 +4,13 @@
 #include <ostream>
 #include <stdexcept>
 
-#define GLFW_INCLUDE_VULKAN // REQUIRED only for GLFW CreateWindowSurface.
-#include <GLFW/glfw3.h>
-
-void RayTracingApplication::run() { std::cout << "Running!" << std::endl; }
+void RayTracingApplication::run() { initVulkan(); }
 
 void RayTracingApplication::assignWindowManager(WindowManager &winManager) {
   windowManager = winManager;
 }
 
-void RayTracingApplication::initVulkan() {
-  std::cout << "Intializing Vulkan..." << std::endl;
-}
+void RayTracingApplication::initVulkan() { createInstance(); }
 
 void RayTracingApplication::createInstance() {
   constexpr vk::ApplicationInfo appInfo{
@@ -25,8 +20,25 @@ void RayTracingApplication::createInstance() {
       .apiVersion = vk::ApiVersion14,
   };
 
+  std::vector<char const *> requiredLayers;
+  if (enableValidationLayers) {
+    requiredLayers.assign(validationLayers.begin(), validationLayers.end());
+  }
+
+  auto layerProperties = context.enumerateInstanceLayerProperties();
+  if (std::ranges::any_of(
+          requiredLayers, [&layerProperties](auto const &requiredLayer) {
+            return std::ranges::none_of(
+                layerProperties, [requiredLayer](auto const &layerProperty) {
+                  return strcmp(layerProperty.layerName, requiredLayer) == 0;
+                });
+          })) {
+    throw std::runtime_error(
+        "One or more required Vulkan layers not supported!");
+  }
+
   uint32_t extensionCount = 0;
-  auto extensions = windowManager.getRequiredExtensions(&extensionCount);
+  auto extensions = windowManager.getRequiredExtensions(extensionCount);
 
   auto extensionProperties = context.enumerateInstanceExtensionProperties();
 
@@ -47,7 +59,7 @@ void RayTracingApplication::createInstance() {
       .ppEnabledExtensionNames = extensions,
   };
 
-  instance = vk::raii::Instance(context, createInfo);
+  instance = std::make_unique<vk::raii::Instance>(context, createInfo);
 }
 
 void RayTracingApplication::mainLoop() {

@@ -5,7 +5,7 @@
 
 class WindowManager {
 public:
-  const char **getRequiredExtensions(uint32_t *extensionCount);
+  const char **getRequiredExtensions(uint32_t &extensionCount);
 };
 
 #endif

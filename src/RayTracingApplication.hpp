@@ -2,6 +2,7 @@
 #define RAY_TRACING_APPLICATION_H
 
 #include "WindowManager.hpp"
+#include <memory>
 #include <vulkan/vulkan_raii.hpp>
 
 #ifdef NDEBUG
@@ -29,7 +30,7 @@ private:
   void cleanup();
 
   WindowManager windowManager;
-  vk::raii::Instance instance;
+  std::unique_ptr<vk::raii::Instance> instance;
   vk::raii::Context context;
 
   void createInstance();
