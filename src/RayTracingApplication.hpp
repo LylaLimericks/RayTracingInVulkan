@@ -1,14 +1,14 @@
 #ifndef RAY_TRACING_APPLICATION_H
 #define RAY_TRACING_APPLICATION_H
 
+#include "WindowManager.hpp"
+#include <vulkan/vulkan_raii.hpp>
+
 #ifdef NDEBUG
 constexpr bool enableValidationLayers = false;
 #else
 constexpr bool enableValidationLayers = true;
 #endif
-
-#include "WindowManager.hpp"
-#include <vulkan/vulkan_raii.hpp>
 
 const std::vector<char const *> validationLayers = {
     "VK_LAYER_KHRONOS_validation",
