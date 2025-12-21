@@ -1,9 +1,11 @@
 #include "RayTracingApplication.hpp"
+#include "Vulkan/Device.hpp"
 #include "vulkan/vulkan.hpp"
 #include <iostream>
 #include <memory>
 #include <ostream>
 #include <stdexcept>
+#include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_raii.hpp>
 
 namespace RayTracing {
@@ -111,6 +113,54 @@ void RayTracingApplication::setupDebugMessenger() {
 
   debugMessenger = std::make_unique<vk::raii::DebugUtilsMessengerEXT>(
       instance->createDebugUtilsMessengerEXT(debugUtilsMessengerCreateInfoEXT));
+}
+
+void RayTracingApplication::pickPhysicalDevice() {
+  auto devices = instance->enumeratePhysicalDevices();
+  if (devices.empty()) {
+    throw std::runtime_error("Failed to find GPUs with Vulkan Support!");
+  }
+
+  // Iterate through the devices to find a suitable candidate
+  for (const auto &device : devices) {
+    const auto queueFamilies = device.getQueueFamilyProperties();
+    bool isSuitable = device.getProperties().apiVersion >= VK_API_VERSION_1_3;
+
+    if (!isSuitable) {
+      continue;
+    }
+
+    // Verify the existence of a queue family that supports graphics
+    for (const auto &queueFamilyProps : queueFamilies) {
+      if ((queueFamilyProps.queueFlags & vk::QueueFlagBits::eGraphics) !=
+          static_cast<vk::QueueFlags>(0)) {
+        isSuitable = false;
+        break;
+      }
+    }
+
+    // Vertify that the device supports all required extensions
+    auto extensions = device.enumerateDeviceExtensionProperties();
+    bool foundAllExtensions = true;
+    for (const auto &reqExtension : deviceExtensions) {
+      bool foundExtension = false;
+      for (const auto &extension : extensions) {
+        if (strcmp(extension.extensionName, reqExtension) == 0) {
+          foundExtension = true;
+          break;
+        }
+      }
+      foundAllExtensions = foundAllExtensions & foundExtension;
+    }
+
+    isSuitable = isSuitable && foundAllExtensions;
+    if (isSuitable) {
+      this->device = Vulkan::Device(device, deviceExtensions);
+      return;
+    }
+  }
+
+  throw std::runtime_error("Failed to find a suitable GPU!");
 }
 
 void RayTracingApplication::mainLoop() {
