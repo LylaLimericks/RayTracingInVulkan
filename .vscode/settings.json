@@ -1,5 +1,10 @@
 {
-  "clangd.arguments": [],
+  "clangd.arguments": [
+    "--log=verbose",
+    "--pretty",
+    "--background-index",
+    "--enable-config"
+  ],
   "clangd.fallbackFlags": [
     "-std=c++20"
   ]
