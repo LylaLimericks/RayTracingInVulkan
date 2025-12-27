@@ -6,20 +6,11 @@
 namespace Vulkan {
 
 Device::Device(vk::raii::PhysicalDevice physicalDevice,
-               const std::vector<const char *> enabledExtensions)
+               const std::vector<const char *> enabledExtensions,
+               const vk::PhysicalDeviceFeatures &deviceFeatures,
+               void *nextDeviceFeatures)
     : physicalDevice(
           std::make_unique<vk::raii::PhysicalDevice>(physicalDevice)) {
-
-  vk::StructureChain<vk::PhysicalDeviceFeatures2,
-                     vk::PhysicalDeviceVulkan13Features,
-                     vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>
-      featureChain = {
-          {}, // vk::PhysicalDeviceFeatures2 (leaving empty for now)
-          {.dynamicRendering =
-               true}, // Enable dynamic rendering from Vulkan 1.3
-          {.extendedDynamicState =
-               true} // Enable extended dynamic state from the extension.
-      };
 
   const uint32_t computeFamilyIndex =
       findQueueFamily(vk::QueueFlagBits::eGraphics);
@@ -36,11 +27,12 @@ Device::Device(vk::raii::PhysicalDevice physicalDevice,
   };
 
   vk::DeviceCreateInfo deviceCreateInfo{
-      .pNext = &featureChain.get<vk::PhysicalDeviceFeatures2>(),
+      .pNext = nextDeviceFeatures,
       .queueCreateInfoCount = 1,
       .pQueueCreateInfos = &deviceQueueCreateInfo,
       .enabledExtensionCount = static_cast<uint32_t>(enabledExtensions.size()),
       .ppEnabledExtensionNames = enabledExtensions.data(),
+      .pEnabledFeatures = &deviceFeatures,
   };
 
   const vk::raii::Device logicalDevice =

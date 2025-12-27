@@ -8,7 +8,10 @@ namespace Vulkan {
 class Device {
 public:
   Device(vk::raii::PhysicalDevice physicalDevice,
-         const std::vector<const char *> enabledExtensions);
+         const std::vector<const char *> enabledExtensions,
+         const vk::PhysicalDeviceFeatures &deviceFeatures,
+         void *nextDeviceFeatures);
+  ~Device();
 
 private:
   std::unique_ptr<vk::raii::PhysicalDevice> physicalDevice;
