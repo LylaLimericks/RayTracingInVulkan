@@ -12,9 +12,11 @@ public:
   const WindowConfig &Config() const { return windowConfig; }
   const std::vector<const char *> GetRequiredExtensions() const;
 
+  GLFWwindow *Handle() const { return window; }
+
 private:
   const WindowConfig windowConfig;
-  const GLFWwindow *window;
+  GLFWwindow *window;
 };
 } // namespace Vulkan
 
