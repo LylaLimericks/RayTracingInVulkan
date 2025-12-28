@@ -2,6 +2,7 @@
 #define WINDOW_H
 
 #include "Vulkan/WindowConfig.hpp"
+#include "vulkan/vulkan.hpp"
 #include <GLFW/glfw3.h>
 #include <vector>
 namespace Vulkan {
@@ -13,6 +14,7 @@ public:
   const std::vector<const char *> GetRequiredExtensions() const;
 
   GLFWwindow *Handle() const { return window; }
+  vk::Extent2D FramebufferSize() const;
 
 private:
   const WindowConfig windowConfig;

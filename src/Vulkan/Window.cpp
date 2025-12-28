@@ -1,6 +1,8 @@
 #include "Vulkan/Window.hpp"
 #include "Vulkan/WindowConfig.hpp"
+#include "vulkan/vulkan.hpp"
 #include <GLFW/glfw3.h>
+#include <cstdint>
 #include <stdexcept>
 namespace Vulkan {
 Window::Window(const WindowConfig &config) : windowConfig(config) {
@@ -29,4 +31,15 @@ const std::vector<const char *> Window::GetRequiredExtensions() const {
 
   return std::vector<const char *>(extensions, extensions + extensionCount);
 }
+
+vk::Extent2D Window::FramebufferSize() const {
+  int width, height;
+  glfwGetFramebufferSize(window, &width, &height);
+
+  return vk::Extent2D{
+      .width = static_cast<uint32_t>(width),
+      .height = static_cast<uint32_t>(height),
+  };
+}
+
 } // namespace Vulkan
