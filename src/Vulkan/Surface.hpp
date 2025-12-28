@@ -10,6 +10,8 @@ class Surface {
 public:
   Surface(const Instance &instance, const Window &window);
 
+  const vk::raii::SurfaceKHR *Handle() const { return surface.get(); }
+
 private:
   std::unique_ptr<vk::raii::SurfaceKHR> surface;
 };
