@@ -1,10 +1,11 @@
 #ifndef DEVICE_H
 #define DEVICE_H
-#include "Vulkan/Surface.hpp"
 #include "vulkan/vulkan.hpp"
 #include <memory>
 #include <vulkan/vulkan_raii.hpp>
 namespace Vulkan {
+
+class Surface;
 
 class Device {
 public:
@@ -14,8 +15,16 @@ public:
          const vk::PhysicalDeviceFeatures &deviceFeatures,
          void *nextDeviceFeatures);
 
+  const vk::raii::PhysicalDevice PhysicalDevice() const { return physicalDevice; }
+  const Surface &Surface() const { return surface; }
+  const vk::raii::Device *Handle() const { return logicalDevice.get(); }
+
+  const uint32_t GraphicsFamilyIndex() const { return graphicsFamilyIndex; }
+  const uint32_t PresentFamilyIndex() const { return presentFamilyIndex; }
+
 private:
-  std::unique_ptr<vk::raii::PhysicalDevice> physicalDevice;
+  const vk::raii::PhysicalDevice physicalDevice;
+  const class Surface &surface;
   std::unique_ptr<vk::raii::Device> logicalDevice;
   std::unique_ptr<vk::raii::Queue> graphicsQueue;
   std::unique_ptr<vk::raii::Queue> presentQueue;

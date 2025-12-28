@@ -1,4 +1,5 @@
 #include "Device.hpp"
+#include "Vulkan/Surface.hpp"
 #include "vulkan/vulkan.hpp"
 #include <memory>
 #include <stdexcept>
@@ -26,12 +27,11 @@ uint32_t findQueueFamily(const std::vector<vk::QueueFamilyProperties> &queueFami
 namespace Vulkan {
 
 Device::Device(vk::raii::PhysicalDevice physicalDevice,
-               const Surface &surface,
+               const class Surface &surface,
                const std::vector<const char *> enabledExtensions,
                const vk::PhysicalDeviceFeatures &deviceFeatures,
                void *nextDeviceFeatures)
-    : physicalDevice(
-          std::make_unique<vk::raii::PhysicalDevice>(physicalDevice)) {
+    : physicalDevice(physicalDevice), surface(surface) {
 
   // Find which queues we want to utilize for what.
 
