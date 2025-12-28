@@ -16,12 +16,13 @@ public:
   Application(const ApplicationInfo &appInfo, const WindowConfig &windowConfig,
               VkPresentModeKHR presentMode, bool enableValidationLayers);
 
-  void setDevice(std::unique_ptr<Device> device);
+  void setPhysicalDevice(Device device);
 
 private:
   std::unique_ptr<Instance> instance;
   std::unique_ptr<Window> window;
   std::unique_ptr<Device> device;
+  std::unique_ptr<Surface> surface;
   // TODO: Determine if we should allow for custom physical device selection.
   // This is initially just to select the default for the getting started
   void pickDefaultPhysicalDevice();

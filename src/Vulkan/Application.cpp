@@ -66,8 +66,10 @@ Application::Application(const ApplicationInfo &appInfo,
           ? std::vector<const char *>{"VK_LAYER_KHRONOS_validation"}
           : std::vector<const char *>();
 
-  window = std::make_unique<Window>(windowConfig);
+  window.reset(new Window(windowConfig));
+  instance.reset(new Instance(*window, appInfo, validationLayers, enableValidationLayers));
   pickDefaultPhysicalDevice();
+  surface.reset(new Surface(*instance, *window));
 }
 
 void Application::pickDefaultPhysicalDevice() {
@@ -93,16 +95,8 @@ void Application::pickDefaultPhysicalDevice() {
       };
 
   const vk::PhysicalDeviceFeatures deviceFeatures{};
-  this->setDevice(
-      std::make_unique<Device>(
-          pickedDevice,
-          deviceExtensions,
-          deviceFeatures,
-          &featureChain));
-}
 
-void Application::setDevice(std::unique_ptr<Device> device) {
-  this->device = std::move(device);
+  device.reset(new Device(pickedDevice, *surface, deviceExtensions, deviceFeatures, &featureChain));
 }
 
 } // namespace Vulkan
