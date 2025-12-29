@@ -9,7 +9,7 @@
 
 namespace Vulkan {
 
-SwapChain::SwapChain(const Device &device, vk::PresentModeKHR presentMode) {
+SwapChain::SwapChain(const Device &device, vk::PresentModeKHR presentMode) : device(device) {
   const auto physicalDevice = device.PhysicalDevice();
   const Surface &surface = device.Surface();
   const Window &window = surface.Window();
@@ -50,6 +50,22 @@ SwapChain::SwapChain(const Device &device, vk::PresentModeKHR presentMode) {
 
   swapChain = std::make_unique<vk::raii::SwapchainKHR>(*device.Handle(), swapChainCreateInfo);
   swapChainImages = swapChain->getImages();
+  RecreateImageViews();
+}
+
+void SwapChain::RecreateImageViews() {
+  swapChainImageViews.clear();
+
+  vk::ImageViewCreateInfo imageViewCreateInfo{
+      .viewType = vk::ImageViewType::e2D,
+      .format = surfaceFormat.format,
+      .subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1},
+  };
+
+  for (const auto &image : swapChainImages) {
+    imageViewCreateInfo.image = image;
+    swapChainImageViews.emplace_back(*device.Handle(), imageViewCreateInfo);
+  }
 }
 
 vk::SurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &availableFormats) const {

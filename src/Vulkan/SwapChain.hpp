@@ -12,12 +12,15 @@ class SwapChain {
 
 public:
   SwapChain(const Device &device, vk::PresentModeKHR presentMode);
+  void RecreateImageViews();
 
   const uint32_t MAX_IMAGE_COUNT = 3u;
 
 private:
+  const Device &device;
   std::unique_ptr<vk::raii::SwapchainKHR> swapChain;
   std::vector<vk::Image> swapChainImages;
+  std::vector<vk::raii::ImageView> swapChainImageViews;
 
   vk::SurfaceFormatKHR surfaceFormat;
   vk::Extent2D extent;
