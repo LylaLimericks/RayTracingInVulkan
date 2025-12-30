@@ -1,5 +1,20 @@
 #include "Application.hpp"
 #include "Vulkan/Device.hpp"
+#include "Vulkan/FixedFunctions/ColorBlendState.hpp"
+#include "Vulkan/FixedFunctions/InputAssemblyState.hpp"
+#include "Vulkan/FixedFunctions/MultisampleState.hpp"
+#include "Vulkan/FixedFunctions/PipelineFixedFunctions.hpp"
+#include "Vulkan/FixedFunctions/RasterizationState.hpp"
+#include "Vulkan/FixedFunctions/ViewportState.hpp"
+#include "Vulkan/GraphicsPipeline.hpp"
+#include "Vulkan/Instance.hpp"
+#include "Vulkan/PipelineLayout.hpp"
+#include "Vulkan/PipelineShaderStages/FragmentShaderStage.hpp"
+#include "Vulkan/PipelineShaderStages/PipelineShaderStage.hpp"
+#include "Vulkan/PipelineShaderStages/VertexShaderStage.hpp"
+#include "Vulkan/ShaderModule.hpp"
+#include "Vulkan/Surface.hpp"
+#include "Vulkan/SwapChain.hpp"
 #include "Window.hpp"
 #include "vulkan/vulkan.hpp"
 #include <vulkan/vulkan_core.h>
@@ -99,4 +114,108 @@ void Application::pickDefaultPhysicalDevice() {
   device.reset(new Device(pickedDevice, *surface, deviceExtensions, deviceFeatures, &featureChain));
 }
 
+void Application::createSwapChain() {
+  swapChain.reset(new SwapChain(*device, vk::PresentModeKHR::eMailbox));
+  const auto fixedFunctions = GetFixedFunctions();
+  const auto shaderStages = GetShaderStages();
+  CreatePipelineLayout();
+  graphicsPipeline.reset(new GraphicsPipeline(*device, *swapChain, fixedFunctions, shaderStages, *pipelineLayout));
+}
+
+PipelineFixedFunctions Application::GetFixedFunctions() {
+  ///
+  // Vertex Input
+  ///
+  vk::PipelineVertexInputStateCreateInfo vertexInputInfo; // Leaving null for now as we're not currently loading verts
+  VertexInputState vertexInput(vertexInputInfo);
+
+  ///
+  // Input Assembly
+  ///
+  vk::PipelineInputAssemblyStateCreateInfo inputAssemblyInfo{
+      .topology = vk::PrimitiveTopology::eTriangleList,
+  };
+  InputAssemblyState inputAssembly(inputAssemblyInfo);
+
+  ///
+  // Viewport
+  ///
+  vk::PipelineViewportStateCreateInfo viewportStateInfo{
+      .viewportCount = 1,
+      .scissorCount = 1,
+  };
+  ViewportState viewportState(viewportStateInfo);
+
+  ///
+  // Rasterizer
+  ///
+  vk::PipelineRasterizationStateCreateInfo rasterizerInfo{
+      .depthClampEnable = vk::False,
+      .rasterizerDiscardEnable = vk::False,
+      .polygonMode = vk::PolygonMode::eFill,
+      .cullMode = vk::CullModeFlagBits::eBack,
+      .frontFace = vk::FrontFace::eClockwise,
+      .depthBiasClamp = vk::False,
+      .depthBiasSlopeFactor = 1.0f,
+      .lineWidth = 1.0f,
+  };
+  RasterizationState rasterizer(rasterizerInfo);
+
+  ///
+  // Multisampling
+  ///
+  vk::PipelineMultisampleStateCreateInfo multisamplerInfo{
+      .rasterizationSamples = vk::SampleCountFlagBits::e1,
+      .sampleShadingEnable = vk::False,
+  };
+  MultiSampleState multisampler(multisamplerInfo);
+
+  ///
+  // Color Blending
+  ///
+  vk::PipelineColorBlendAttachmentState colorBlendAttachment{
+      .blendEnable = vk::False,
+      .colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA,
+  };
+
+  vk::PipelineColorBlendStateCreateInfo colorBlendingInfo{
+      .logicOpEnable = vk::False,
+      .logicOp = vk::LogicOp::eCopy,
+      .attachmentCount = 1,
+      .pAttachments = &colorBlendAttachment,
+  };
+  ColorBlendState colorBlend(colorBlendingInfo);
+
+  return PipelineFixedFunctions{
+      .colorBlendState = colorBlend,
+      .inputAssemblyState = inputAssembly,
+      .multisampleState = multisampler,
+      .rasterizationState = rasterizer,
+      .vertexInputState = vertexInput,
+      .viewportState = viewportState,
+  };
+}
+
+void Application::CreatePipelineLayout() {
+  vk::PipelineLayoutCreateInfo pipelineLayoutInfo{
+      .setLayoutCount = 0,
+      .pushConstantRangeCount = 0,
+  };
+
+  pipelineLayout.reset(new PipelineLayout(*device, pipelineLayoutInfo));
+}
+
+std::vector<PipelineShaderStage> Application::GetShaderStages() {
+  ShaderModule shaderModule(*device, ShaderModules[0]);
+
+  VertexShaderStage vertShader(shaderModule, "vertMain");
+  FragmentShaderStage fragShader(shaderModule, "fragMain");
+
+  std::vector<PipelineShaderStage> ret{
+      vertShader,
+      fragShader,
+  };
+
+  return ret;
+}
 } // namespace Vulkan
