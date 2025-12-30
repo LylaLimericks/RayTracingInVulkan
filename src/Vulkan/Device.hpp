@@ -17,7 +17,7 @@ public:
 
   const vk::raii::PhysicalDevice PhysicalDevice() const { return physicalDevice; }
   const Surface &Surface() const { return surface; }
-  const vk::raii::Device *Handle() const { return logicalDevice.get(); }
+  vk::raii::Device *Handle() const { return logicalDevice.get(); }
 
   const uint32_t GraphicsFamilyIndex() const { return graphicsFamilyIndex; }
   const uint32_t PresentFamilyIndex() const { return presentFamilyIndex; }

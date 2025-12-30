@@ -12,6 +12,9 @@ class SwapChain {
 
 public:
   SwapChain(const Device &device, vk::PresentModeKHR presentMode);
+  vk::SurfaceFormatKHR SurfaceFormat() const { return surfaceFormat; }
+  const vk::Format *pFormat() const { return &surfaceFormat.format; }
+
   void RecreateImageViews();
 
   const uint32_t MAX_IMAGE_COUNT = 3u;

@@ -7,13 +7,17 @@ namespace Vulkan {
 class ShaderModule;
 
 class PipelineShaderStage {
+public:
+  vk::PipelineShaderStageCreateInfo GetCreateInfo() const;
+
 protected:
-  PipelineShaderStage(const vk::ShaderStageFlags shaderStage, const ShaderModule &shaderModule, const std::string &pName);
+  PipelineShaderStage(vk::ShaderStageFlagBits shaderStage, const ShaderModule &shaderModule, const std::string &pName);
+  const class ShaderModule &ShaderModule() const { return shaderModule; }
 
 private:
   const std::string &pName;
-  const ShaderModule &shaderModule;
-  const vk::ShaderStageFlags shaderStage;
+  const class ShaderModule &shaderModule;
+  const vk::ShaderStageFlagBits shaderStage;
 };
 } // namespace Vulkan
 

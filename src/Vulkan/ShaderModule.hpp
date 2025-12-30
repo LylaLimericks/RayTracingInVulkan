@@ -14,6 +14,8 @@ public:
   ShaderModule(const Device &device, const std::vector<char> &code);
   ~ShaderModule();
 
+  const vk::raii::ShaderModule *Handle() const { return shaderModule.get(); }
+
 private:
   const class Device &device;
   std::unique_ptr<vk::raii::ShaderModule> shaderModule;
