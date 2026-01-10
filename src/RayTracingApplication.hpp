@@ -1,15 +1,14 @@
-#ifndef RAY_TRACING_APPLICATION_H
-#define RAY_TRACING_APPLICATION_H
-
-#include "Vulkan/Device.hpp"
-#include "WindowManager.hpp"
-#include <iostream>
-#include <memory>
+#pragma once
+#include "Vulkan/Application.hpp"
+#include "Vulkan/ApplicationInfo.hpp"
+#include "Vulkan/Version.hpp"
+#include "Vulkan/WindowConfig.hpp"
+#include "vulkan/vulkan.hpp"
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_raii.hpp>
 #include <vulkan/vulkan_to_string.hpp>
 
-namespace RayTracing {
+namespace Implementations {
 
 #ifdef NDEBUG
 constexpr bool enableValidationLayers = false;
@@ -21,48 +20,34 @@ const std::vector<char const *> validationLayers = {
     "VK_LAYER_KHRONOS_validation",
 };
 
-// TODO: Refactor these to no longer be compile time constants.
-constexpr uint32_t WIDTH = 800;
-constexpr uint32_t HEIGHT = 600;
-
-class RayTracingApplication {
-public:
-  void run();
-  void assignWindowManager(WindowManager &winManager);
-  void setPhysicalDevice();
-
-private:
-  void initVulkan();
-  void mainLoop();
-  void cleanup();
-
-  WindowManager windowManager;
-  Vulkan::Device device;
-  vk::raii::Context context;
-  std::unique_ptr<vk::raii::Instance> instance;
-  std::unique_ptr<vk::raii::DebugUtilsMessengerEXT> debugMessenger;
-
-  std::vector<const char *> deviceExtensions = {
-      vk::KHRSwapchainExtensionName, vk::KHRSpirv14ExtensionName,
-      vk::KHRSynchronization2ExtensionName,
-      vk::KHRCreateRenderpass2ExtensionName};
-
-  void createInstance();
-  std::vector<const char *> getRequiredExtensions();
-  void setupDebugMessenger();
-
-  void pickPhysicalDevice();
-
-  static VKAPI_ATTR vk::Bool32 VKAPI_CALL debugCallback(
-      vk::DebugUtilsMessageSeverityFlagBitsEXT severity,
-      vk::DebugUtilsMessageTypeFlagsEXT type,
-      const vk::DebugUtilsMessengerCallbackDataEXT *pCallbackData, void *) {
-    std::cerr << "validation layer: type " << vk::to_string(type)
-              << " msg: " << pCallbackData->pMessage << std::endl;
-
-    return vk::False;
-  }
+constexpr Vulkan::WindowConfig windowConfig{
+    .Title = "Ray Tracing App",
+    .Width = 600,
+    .Height = 400,
 };
 
-} // namespace RayTracing
-#endif
+constexpr Vulkan::ApplicationInfo appInfo{
+    .AppVersion = Vulkan::Version{.Major = 0, .Minor = 0, .Patch = 0},
+    .EngineVersion = Vulkan::Version{.Major = 0, .Minor = 0, .Patch = 0},
+    .EngineName = "None",
+};
+
+class RayTracingApplication : public Vulkan::Application {
+public:
+  RayTracingApplication() : Vulkan::Application(appInfo, windowConfig, vk::PresentModeKHR::eMailbox, enableValidationLayers) {}
+  void run();
+
+private:
+  void mainLoop();
+  void createSyncObjects();
+  void drawFrame();
+  void cleanUp();
+  void recordCommandBuffer(const uint32_t imageIndex);
+
+  std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
+  std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
+  vk::raii::Fence drawFence = nullptr;
+  uint32_t currentFrame = 0;
+};
+
+} // namespace Implementations

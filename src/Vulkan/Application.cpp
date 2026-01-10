@@ -1,4 +1,6 @@
 #include "Application.hpp"
+#include "CommandPool.hpp"
+#include "Vulkan/CommandBuffer.hpp"
 #include "Vulkan/Device.hpp"
 #include "Vulkan/FixedFunctions/ColorBlendState.hpp"
 #include "Vulkan/FixedFunctions/InputAssemblyState.hpp"
@@ -74,8 +76,8 @@ namespace Vulkan {
 
 Application::Application(const ApplicationInfo &appInfo,
                          const WindowConfig &windowConfig,
-                         VkPresentModeKHR presentMode,
-                         bool enableValidationLayers) {
+                         const vk::PresentModeKHR presentMode,
+                         bool enableValidationLayers) : presentMode(presentMode) {
   const auto validationLayers =
       enableValidationLayers
           ? std::vector<const char *>{"VK_LAYER_KHRONOS_validation"}
@@ -85,6 +87,13 @@ Application::Application(const ApplicationInfo &appInfo,
   instance.reset(new Instance(*window, appInfo, validationLayers, enableValidationLayers));
   pickDefaultPhysicalDevice();
   surface.reset(new Surface(*instance, *window));
+  createSwapChain();
+  frameCount = swapChain->Size();
+
+  commandPool.reset(new CommandPool(*device, device->GraphicsFamilyIndex()));
+  for (int i = 0; i < frameCount; i++) {
+    commandBuffers[i].reset(new CommandBuffer(*commandPool, vk::CommandBufferLevel::ePrimary));
+  }
 }
 
 void Application::pickDefaultPhysicalDevice() {

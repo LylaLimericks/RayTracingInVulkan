@@ -16,8 +16,14 @@ public:
   const vk::Format *pFormat() const { return &surfaceFormat.format; }
 
   void RecreateImageViews();
+  vk::Image &Image(const uint32_t i) { return swapChainImages[i]; }
+  vk::raii::ImageView &ImageView(const uint32_t i) { return swapChainImageViews[i]; }
+  const vk::Extent2D Extent() const { return extent; }
 
   const uint32_t MAX_IMAGE_COUNT = 3u;
+  const size_t Size() const { return swapChainImages.size(); }
+
+  vk::ResultValue<uint32_t> AcquireNextFrame(uint64_t timeout, vk::Semaphore semphore);
 
 private:
   const Device &device;

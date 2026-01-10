@@ -15,6 +15,7 @@ class PipelineLayout;
 class GraphicsPipeline {
 public:
   GraphicsPipeline(const Device &device, const SwapChain &swapChain, const PipelineFixedFunctions &pipelineStates, const std::vector<PipelineShaderStage> shaderStages, const PipelineLayout &pipelineLayout);
+  vk::raii::Pipeline *Handle() const { return graphicsPipeline.get(); }
 
 private:
   const SwapChain &swapChain;

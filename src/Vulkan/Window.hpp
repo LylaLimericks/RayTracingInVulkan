@@ -12,6 +12,8 @@ public:
 
   const WindowConfig &Config() const { return windowConfig; }
   const std::vector<const char *> GetRequiredExtensions() const;
+  bool shouldClose() const;
+  void pollEvents() const;
 
   GLFWwindow *Handle() const { return window; }
   vk::Extent2D FramebufferSize() const;

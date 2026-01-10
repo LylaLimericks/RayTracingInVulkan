@@ -42,4 +42,12 @@ vk::Extent2D Window::FramebufferSize() const {
   };
 }
 
+bool Window::shouldClose() const {
+  return !glfwWindowShouldClose(window);
+}
+
+void Window::pollEvents() const {
+  glfwPollEvents();
+}
+
 } // namespace Vulkan

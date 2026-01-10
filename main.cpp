@@ -5,7 +5,7 @@
 
 int main() {
   try {
-    RayTracing::RayTracingApplication app;
+    Implementations::RayTracingApplication app;
     app.run();
   } catch (const std::exception &e) {
     std::cerr << e.what() << std::endl;

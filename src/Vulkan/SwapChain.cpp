@@ -68,6 +68,10 @@ void SwapChain::RecreateImageViews() {
   }
 }
 
+vk::ResultValue<uint32_t> SwapChain::AcquireNextFrame(uint64_t timeout, vk::Semaphore semphore) {
+  return swapChain->acquireNextImage(timeout, semphore, nullptr);
+}
+
 vk::SurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &availableFormats) const {
 
   for (const auto &availableFormat : availableFormats) {
