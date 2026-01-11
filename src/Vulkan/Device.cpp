@@ -1,37 +1,18 @@
 #include "Device.hpp"
-#include "Vulkan/Surface.hpp"
+#include "Vulkan/CommandPool.hpp"
 #include "vulkan/vulkan.hpp"
 #include <memory>
 #include <stdexcept>
 #include <vulkan/vulkan_raii.hpp>
 
-namespace {
-/**
- * Finds the first queue family on the device which supports the appropriate flags
- *
- * @return Index of the queue family. -1 on none found.
- */
-uint32_t findQueueFamily(const std::vector<vk::QueueFamilyProperties> &queueFamilyProperties, const vk::QueueFlags flags) {
-  for (uint32_t i = 0; i < queueFamilyProperties.size(); i++) {
-    const auto qfp = queueFamilyProperties[i];
-    if (qfp.queueFlags & flags) {
-      return i;
-    }
-  }
-
-  return -1;
-}
-
-} // namespace
-
 namespace Vulkan {
 
 Device::Device(vk::raii::PhysicalDevice physicalDevice,
-               const class Surface &surface,
+               const vk::SurfaceKHR &surface,
                const std::vector<const char *> enabledExtensions,
                const vk::PhysicalDeviceFeatures &deviceFeatures,
                void *nextDeviceFeatures)
-    : physicalDevice(physicalDevice), surface(surface) {
+    : physicalDevice(physicalDevice) {
 
   // Find which queues we want to utilize for what.
 
@@ -50,13 +31,13 @@ Device::Device(vk::raii::PhysicalDevice physicalDevice,
   }
 
   presentFamilyIndex =
-      physicalDevice.getSurfaceSupportKHR(graphicsFamilyIndex, *surface.Handle())
+      physicalDevice.getSurfaceSupportKHR(graphicsFamilyIndex, surface)
           ? graphicsFamilyIndex
           : static_cast<uint32_t>(queueFamilies.size());
 
   if (presentFamilyIndex == queueFamilies.size()) { // Initial graphics queue didn't support presentation, try to find one that supports both
     for (size_t i = 0; i < queueFamilies.size(); i++) {
-      if ((queueFamilies[i].queueFlags & vk::QueueFlagBits::eGraphics) && physicalDevice.getSurfaceSupportKHR(static_cast<uint32_t>(i), *surface.Handle())) {
+      if ((queueFamilies[i].queueFlags & vk::QueueFlagBits::eGraphics) && physicalDevice.getSurfaceSupportKHR(static_cast<uint32_t>(i), surface)) {
         graphicsFamilyIndex = static_cast<uint32_t>(i);
         presentFamilyIndex = graphicsFamilyIndex;
         break;
@@ -64,7 +45,7 @@ Device::Device(vk::raii::PhysicalDevice physicalDevice,
     }
     if (presentFamilyIndex == queueFamilies.size()) { // If we couldn't find any queues that support both, just take the first queue with presentation support
       for (size_t i = 0; i < queueFamilies.size(); i++) {
-        if (physicalDevice.getSurfaceSupportKHR(static_cast<uint32_t>(i), *surface.Handle())) {
+        if (physicalDevice.getSurfaceSupportKHR(static_cast<uint32_t>(i), surface)) {
           presentFamilyIndex = static_cast<uint32_t>(i);
           break;
         }
@@ -109,14 +90,31 @@ Device::Device(vk::raii::PhysicalDevice physicalDevice,
       .pEnabledFeatures = &deviceFeatures,
   };
 
-  const vk::raii::Device logicalDevice =
-      vk::raii::Device(physicalDevice, deviceCreateInfo);
+  logicalDevice = std::make_unique<vk::raii::Device>(vk::raii::Device(physicalDevice, deviceCreateInfo));
+  graphicsQueue = std::make_unique<vk::raii::Queue>(vk::raii::Queue(*logicalDevice.get(), graphicsFamilyIndex, 0));
+  presentQueue = std::make_unique<vk::raii::Queue>(vk::raii::Queue(*logicalDevice.get(), presentFamilyIndex, 0));
+  commandPool = CreateCommandPool(vk::CommandPoolCreateFlagBits::eResetCommandBuffer, graphicsFamilyIndex);
+}
 
-  this->logicalDevice =
-      std::make_unique<vk::raii::Device>(physicalDevice, deviceCreateInfo);
-  this->graphicsQueue =
-      std::make_unique<vk::raii::Queue>(logicalDevice, graphicsFamilyIndex, 0);
-  this->presentQueue = std::make_unique<vk::raii::Queue>(logicalDevice, presentFamilyIndex, 0);
+std::unique_ptr<vk::raii::CommandPool> Device::CreateCommandPool(const vk::CommandPoolCreateFlagBits createFlagBits, const uint32_t queueIndex) {
+  vk::CommandPoolCreateInfo poolInfo{
+      .flags = createFlagBits,
+      .queueFamilyIndex = queueIndex,
+  };
+
+  auto commandPool = std::make_unique<vk::raii::CommandPool>(*logicalDevice.get(), poolInfo);
+
+  return commandPool;
+}
+
+std::vector<vk::raii::CommandBuffer> Device::CreateCommandBuffers(const vk::CommandBufferLevel bufferLevel, const vk::CommandPool &commandPool, const uint32_t &bufferCount) {
+  vk::CommandBufferAllocateInfo allocInfo{
+      .commandPool = commandPool,
+      .level = bufferLevel,
+      .commandBufferCount = bufferCount,
+  };
+
+  return vk::raii::CommandBuffers(*logicalDevice.get(), allocInfo);
 }
 
 } // namespace Vulkan
