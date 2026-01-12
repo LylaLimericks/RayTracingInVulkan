@@ -1,8 +1,8 @@
 #include "PipelineLayout.hpp"
-#include "Vulkan/Device.hpp"
+#include "Vulkan/VulkanDevice.hpp"
 
 namespace Vulkan {
-PipelineLayout::PipelineLayout(const Device &device, const vk::PipelineLayoutCreateInfo &pipelineLayoutInfo) : device(device) {
-  pipelineLayout = std::make_unique<vk::raii::PipelineLayout>(*device.Handle(), pipelineLayoutInfo);
+PipelineLayout::PipelineLayout(const VulkanDevice &device, const vk::PipelineLayoutCreateInfo &pipelineLayoutInfo) : device(device) {
+  pipelineLayout = device.CreatePipelineLayout(pipelineLayoutInfo);
 }
 } // namespace Vulkan

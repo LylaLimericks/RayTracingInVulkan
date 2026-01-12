@@ -1,7 +1,6 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 #include "vulkan/vulkan.hpp"
-#include <memory>
 #include <vulkan/vulkan_raii.hpp>
 namespace Vulkan {
 
@@ -22,8 +21,13 @@ public:
   const vk::Device LogicalDevice() const { return logicalDevice; }
   explicit operator const vk::Device() const { return logicalDevice; }
 
-  std::unique_ptr<vk::raii::SwapchainKHR> CreateSwapChain(const vk::SwapchainCreateInfoKHR createInfo) const;
-  vk::raii::ImageView CreateImageView(const vk::ImageViewCreateInfo imageViewCreateInfo) const;
+  vk::raii::SwapchainKHR CreateSwapChain(const vk::SwapchainCreateInfoKHR &createInfo) const { return vk::raii::SwapchainKHR(logicalDevice, createInfo); };
+  vk::raii::ImageView CreateImageView(const vk::ImageViewCreateInfo &createInfo) const { return vk::raii::ImageView(logicalDevice, createInfo); }
+  vk::raii::ShaderModule CreateShaderModule(const vk::ShaderModuleCreateInfo &createInfo) const { return vk::raii::ShaderModule(logicalDevice, createInfo); };
+  vk::raii::PipelineLayout CreatePipelineLayout(const vk::PipelineLayoutCreateInfo &createInfo) const { return vk::raii::PipelineLayout(logicalDevice, createInfo); }
+  vk::raii::Semaphore CreateSemaphore(const vk::SemaphoreCreateInfo &createInfo) const { return vk::raii::Semaphore(logicalDevice, createInfo); }
+  vk::raii::Fence CreateFence(const vk::FenceCreateInfo &createInfo) const { return vk::raii::Fence(logicalDevice, createInfo); }
+  vk::Result WaitForFences(const vk::ArrayProxy<const vk::Fence> &fences, vk::Bool32 waitAll, uint64_t timeout) const { return logicalDevice.waitForFences(fences, waitAll, timeout); };
 
 private:
   const std::vector<const char *> &enabledExtensions;

@@ -16,6 +16,8 @@ public:
   const class Window &Window() const { return window; }
   const class Instance &Instance() const { return instance; }
 
+  operator vk::SurfaceKHR() const { return *surface.get(); }
+
 private:
   const class Window &window;
   const class Instance &instance;

@@ -89,11 +89,11 @@ Instance::Instance(const Window &window,
       .ppEnabledExtensionNames = reqExtensions.data(),
   };
 
-  instance = std::make_unique<vk::raii::Instance>(context, createInfo);
+  instance = vk::raii::Instance(context, createInfo);
 }
 
 const std::vector<vk::raii::PhysicalDevice> Instance::PhysicalDevices() const {
-  return instance->enumeratePhysicalDevices();
+  return instance.enumeratePhysicalDevices();
 }
 
 } // namespace Vulkan

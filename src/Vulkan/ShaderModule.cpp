@@ -1,5 +1,5 @@
 #include "ShaderModule.hpp"
-#include "Vulkan/Device.hpp"
+#include "Vulkan/VulkanDevice.hpp"
 #include "vulkan/vulkan.hpp"
 #include <fstream>
 #include <stdexcept>
@@ -7,16 +7,16 @@
 
 namespace Vulkan {
 
-ShaderModule::ShaderModule(const Device &device, const std::string &filename) : ShaderModule(device, ReadFromFile(filename)) {
+ShaderModule::ShaderModule(const VulkanDevice &device, const std::string &filename) : ShaderModule(device, ReadFromFile(filename)) {
 }
 
-ShaderModule::ShaderModule(const Device &device, const std::vector<char> &code) : device(device) {
+ShaderModule::ShaderModule(const VulkanDevice &device, const std::vector<char> &code) : device(device) {
   vk::ShaderModuleCreateInfo createInfo{
       .codeSize = code.size() * sizeof(char),
       .pCode = reinterpret_cast<const uint32_t *>(code.data()),
   };
 
-  shaderModule = std::make_unique<vk::raii::ShaderModule>(*device.Handle(), createInfo);
+  shaderModule = device.CreateShaderModule(createInfo);
 }
 
 std::vector<char> ShaderModule::ReadFromFile(const std::string &filename) {

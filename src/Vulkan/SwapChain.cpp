@@ -1,6 +1,6 @@
 #include "SwapChain.hpp"
-#include "Vulkan/Device.hpp"
 #include "Vulkan/Surface.hpp"
+#include "Vulkan/VulkanDevice.hpp"
 #include "Vulkan/Window.hpp"
 #include "vulkan/vulkan.hpp"
 #include <memory>
@@ -9,11 +9,8 @@
 
 namespace Vulkan {
 
-SwapChain::SwapChain(const Device &device, vk::PresentModeKHR presentMode) : device(device) {
-  const auto physicalDevice = device.PhysicalDevice();
-  const Surface &surface = device.Surface();
-  const Window &window = surface.Window();
-  const auto surfaceCapabilities = physicalDevice.getSurfaceCapabilitiesKHR(*surface.Handle());
+SwapChain::SwapChain(const vk::PhysicalDevice &physicalDevice, const VulkanDevice &device, const Window &window, const vk::SurfaceKHR &surface, vk::PresentModeKHR presentMode) : device(device) {
+  const auto surfaceCapabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface);
 
   surfaceFormat = chooseSwapSurfaceFormat(physicalDevice.getSurfaceFormatsKHR());
   extent = chooseSwapExtent(window, surfaceCapabilities);
@@ -26,7 +23,7 @@ SwapChain::SwapChain(const Device &device, vk::PresentModeKHR presentMode) : dev
 
   vk::SwapchainCreateInfoKHR swapChainCreateInfo{
       .flags = vk::SwapchainCreateFlagsKHR(),
-      .surface = *surface.Handle(),
+      .surface = surface,
       .minImageCount = minImageCount,
       .imageFormat = surfaceFormat.format,
       .imageColorSpace = surfaceFormat.colorSpace,
@@ -36,7 +33,7 @@ SwapChain::SwapChain(const Device &device, vk::PresentModeKHR presentMode) : dev
       .imageSharingMode = vk::SharingMode::eExclusive,
       .preTransform = surfaceCapabilities.currentTransform,
       .compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,
-      .presentMode = choosePresentMode(physicalDevice.getSurfacePresentModesKHR(*surface.Handle()), presentMode),
+      .presentMode = choosePresentMode(physicalDevice.getSurfacePresentModesKHR(surface), presentMode),
       .clipped = true,
       .oldSwapchain = VK_NULL_HANDLE,
   };
@@ -48,8 +45,9 @@ SwapChain::SwapChain(const Device &device, vk::PresentModeKHR presentMode) : dev
     swapChainCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
   }
 
-  swapChain = std::make_unique<vk::raii::SwapchainKHR>(*device.Handle(), swapChainCreateInfo);
-  swapChainImages = swapChain->getImages();
+  const vk::Device logicalDevice = static_cast<vk::Device>(device);
+  swapChain = device.CreateSwapChain(swapChainCreateInfo);
+  swapChainImages = swapChain.getImages();
   RecreateImageViews();
 }
 
@@ -64,12 +62,12 @@ void SwapChain::RecreateImageViews() {
 
   for (const auto &image : swapChainImages) {
     imageViewCreateInfo.image = image;
-    swapChainImageViews.emplace_back(*device.Handle(), imageViewCreateInfo);
+    swapChainImageViews.emplace_back(device.CreateImageView(imageViewCreateInfo));
   }
 }
 
 vk::ResultValue<uint32_t> SwapChain::AcquireNextFrame(uint64_t timeout, vk::Semaphore semphore) {
-  return swapChain->acquireNextImage(timeout, semphore, nullptr);
+  return swapChain.acquireNextImage(timeout, semphore, nullptr);
 }
 
 vk::SurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &availableFormats) const {

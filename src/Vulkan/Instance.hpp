@@ -18,11 +18,11 @@ public:
 
   const std::vector<vk::raii::PhysicalDevice> PhysicalDevices() const;
 
-  vk::raii::Instance *Handle() const { return instance.get(); } // TODO: This is a temp escape hatch for initialization. FIX THIS
+  vk::Instance Handle() const { return instance; } // TODO: This is a temp escape hatch for initialization. FIX THIS
 
 private:
   vk::raii::Context context;
-  std::unique_ptr<vk::raii::Instance> instance;
+  vk::raii::Instance instance = nullptr;
 
   const Window &window;
   const ApplicationInfo &appInfo;

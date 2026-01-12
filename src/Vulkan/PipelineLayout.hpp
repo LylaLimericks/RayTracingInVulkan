@@ -6,16 +6,16 @@
 
 namespace Vulkan {
 
-class Device;
+class VulkanDevice;
 
 class PipelineLayout {
 public:
-  PipelineLayout(const Device &device, const vk::PipelineLayoutCreateInfo &pipelineLayoutInfo);
-  vk::raii::PipelineLayout *Handle() const { return pipelineLayout.get(); }
+  PipelineLayout(const VulkanDevice &device, const vk::PipelineLayoutCreateInfo &pipelineLayoutInfo);
+  const vk::PipelineLayout Handle() const { return pipelineLayout; }
 
 private:
-  std::unique_ptr<vk::raii::PipelineLayout> pipelineLayout;
-  const Device &device;
+  vk::raii::PipelineLayout pipelineLayout = nullptr;
+  const VulkanDevice &device;
 };
 } // namespace Vulkan
 

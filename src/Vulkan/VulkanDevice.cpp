@@ -114,12 +114,4 @@ std::vector<vk::raii::CommandBuffer> VulkanDevice::CreateCommandBuffers(const vk
   return vk::raii::CommandBuffers(logicalDevice, allocInfo);
 }
 
-std::unique_ptr<vk::raii::SwapchainKHR> VulkanDevice::CreateSwapChain(const vk::SwapchainCreateInfoKHR createInfo) const {
-  return std::make_unique<vk::raii::SwapchainKHR>(logicalDevice, createInfo);
-}
-
-vk::raii::ImageView VulkanDevice::CreateImageView(const vk::ImageViewCreateInfo imageViewCreateInfo) const {
-  return vk::raii::ImageView(logicalDevice, imageViewCreateInfo);
-}
-
 } // namespace Vulkan

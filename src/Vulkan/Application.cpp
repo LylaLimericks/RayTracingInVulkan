@@ -1,7 +1,4 @@
 #include "Application.hpp"
-#include "CommandPool.hpp"
-#include "Vulkan/CommandBuffer.hpp"
-#include "Vulkan/Device.hpp"
 #include "Vulkan/FixedFunctions/ColorBlendState.hpp"
 #include "Vulkan/FixedFunctions/InputAssemblyState.hpp"
 #include "Vulkan/FixedFunctions/MultisampleState.hpp"
@@ -17,6 +14,7 @@
 #include "Vulkan/ShaderModule.hpp"
 #include "Vulkan/Surface.hpp"
 #include "Vulkan/SwapChain.hpp"
+#include "Vulkan/VulkanDevice.hpp"
 #include "Window.hpp"
 #include "vulkan/vulkan.hpp"
 #include <vulkan/vulkan_core.h>
@@ -89,11 +87,7 @@ Application::Application(const ApplicationInfo &appInfo,
   surface.reset(new Surface(*instance, *window));
   createSwapChain();
   frameCount = swapChain->Size();
-
-  commandPool.reset(new CommandPool(*device, device->GraphicsFamilyIndex()));
-  for (int i = 0; i < frameCount; i++) {
-    commandBuffers[i].reset(new CommandBuffer(*commandPool, vk::CommandBufferLevel::ePrimary));
-  }
+  commandBuffers = device->CreateCommandBuffers(vk::CommandBufferLevel::ePrimary, frameCount);
 }
 
 void Application::pickDefaultPhysicalDevice() {
@@ -119,12 +113,12 @@ void Application::pickDefaultPhysicalDevice() {
       };
 
   const vk::PhysicalDeviceFeatures deviceFeatures{};
-
-  device.reset(new Device(pickedDevice, *surface, deviceExtensions, deviceFeatures, &featureChain));
+  physicalDevice = pickedDevice;
+  device.reset(new VulkanDevice(pickedDevice, *surface->Handle(), deviceExtensions, deviceFeatures, &featureChain));
 }
 
 void Application::createSwapChain() {
-  swapChain.reset(new SwapChain(*device, vk::PresentModeKHR::eMailbox));
+  swapChain.reset(new SwapChain(physicalDevice, *device.get(), *window.get(), *surface->Handle(), vk::PresentModeKHR::eMailbox));
   const auto fixedFunctions = GetFixedFunctions();
   const auto shaderStages = GetShaderStages();
   CreatePipelineLayout();
@@ -211,11 +205,11 @@ void Application::CreatePipelineLayout() {
       .pushConstantRangeCount = 0,
   };
 
-  pipelineLayout.reset(new PipelineLayout(*device, pipelineLayoutInfo));
+  pipelineLayout.reset(new PipelineLayout(*device.get(), pipelineLayoutInfo));
 }
 
 std::vector<PipelineShaderStage> Application::GetShaderStages() {
-  ShaderModule shaderModule(*device, ShaderModules[0]);
+  ShaderModule shaderModule(*device.get(), ShaderModules[0]);
 
   VertexShaderStage vertShader(shaderModule, "vertMain");
   FragmentShaderStage fragShader(shaderModule, "fragMain");
