@@ -42,7 +42,7 @@ private:
   void createSyncObjects();
   void drawFrame();
   void cleanUp();
-  void recordCommandBuffer(const uint32_t imageIndex);
+  void recordCommandBuffer(const size_t currentFrame, const uint32_t imageIndex);
 
   std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
   std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
