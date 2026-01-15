@@ -29,6 +29,17 @@ public:
   void initializeGraphicsPipeline();
   void createSwapChain();
 
+  void TransitionImageLayout(
+      const vk::Image &image,
+      const vk::ImageLayout &oldLayout,
+      const vk::ImageLayout &newLayout,
+      const vk::AccessFlags2 &srcAccessMask,
+      const vk::AccessFlags2 &dstAccessMask,
+      const vk::PipelineStageFlags2 &srcStageMask,
+      const vk::PipelineStageFlags2 &dstStageMask,
+      const vk::ImageAspectFlags &imageAspectFlags,
+      const uint32_t &currentFrame) const;
+
 protected:
   const std::string ShaderModules[1]{
       "shaders/slang.spv",
