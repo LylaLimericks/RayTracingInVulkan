@@ -90,8 +90,8 @@ VulkanDevice::VulkanDevice(vk::raii::PhysicalDevice physicalDevice,
   };
 
   logicalDevice = vk::raii::Device(physicalDevice, deviceCreateInfo);
-  graphicsQueue = vk::raii::Queue(vk::raii::Queue(logicalDevice, graphicsFamilyIndex, 0));
-  presentQueue = vk::raii::Queue(vk::raii::Queue(logicalDevice, presentFamilyIndex, 0));
+  graphicsQueue = CreateQueue(graphicsFamilyIndex, 0);
+  presentQueue = CreateQueue(presentFamilyIndex, 0);
   commandPool = CreateCommandPool(vk::CommandPoolCreateFlagBits::eResetCommandBuffer, graphicsFamilyIndex);
 }
 

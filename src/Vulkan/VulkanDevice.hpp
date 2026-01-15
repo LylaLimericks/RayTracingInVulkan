@@ -16,11 +16,16 @@ public:
   const uint32_t GraphicsFamilyIndex() const { return graphicsFamilyIndex; }
   const uint32_t PresentFamilyIndex() const { return presentFamilyIndex; }
   vk::raii::CommandPool CreateCommandPool(const vk::CommandPoolCreateFlagBits createFlagBits, const uint32_t queueIndex);
+
   std::vector<vk::raii::CommandBuffer> CreateCommandBuffers(const vk::CommandBufferLevel commandBufferLevel, const uint32_t &bufferCount);
   std::vector<vk::raii::CommandBuffer> CreateCommandBuffers(const vk::CommandBufferLevel commandBufferLevel, const vk::CommandPool &commandPool, const uint32_t &bufferCount);
+
   const vk::Device LogicalDevice() const { return logicalDevice; }
   explicit operator const vk::Device() const { return logicalDevice; }
 
+  /****
+   * Constructables requiring logical device
+   *****/
   vk::raii::SwapchainKHR CreateSwapChain(const vk::SwapchainCreateInfoKHR &createInfo) const { return vk::raii::SwapchainKHR(logicalDevice, createInfo); };
   vk::raii::ImageView CreateImageView(const vk::ImageViewCreateInfo &createInfo) const { return vk::raii::ImageView(logicalDevice, createInfo); }
   vk::raii::ShaderModule CreateShaderModule(const vk::ShaderModuleCreateInfo &createInfo) const { return vk::raii::ShaderModule(logicalDevice, createInfo); };
@@ -28,6 +33,7 @@ public:
   vk::raii::Semaphore CreateSemaphore(const vk::SemaphoreCreateInfo &createInfo) const { return vk::raii::Semaphore(logicalDevice, createInfo); }
   vk::raii::Fence CreateFence(const vk::FenceCreateInfo &createInfo) const { return vk::raii::Fence(logicalDevice, createInfo); }
   vk::Result WaitForFences(const vk::ArrayProxy<const vk::Fence> &fences, vk::Bool32 waitAll, uint64_t timeout) const { return logicalDevice.waitForFences(fences, waitAll, timeout); };
+  vk::raii::Queue CreateQueue(const uint32_t &queueIndex, const uint32_t &familyIndex) const { return vk::raii::Queue(logicalDevice, queueIndex, familyIndex); }
 
 private:
   const std::vector<const char *> &enabledExtensions;
