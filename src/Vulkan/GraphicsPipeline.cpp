@@ -1,16 +1,15 @@
 #include "GraphicsPipeline.hpp"
-#include "Vulkan/Device.hpp"
 #include "Vulkan/FixedFunctions/PipelineFixedFunctions.hpp"
 #include "Vulkan/PipelineLayout.hpp"
 #include "Vulkan/PipelineShaderStages/PipelineShaderStage.hpp"
 #include "Vulkan/SwapChain.hpp"
+#include "Vulkan/VulkanDevice.hpp"
 #include "vulkan/vulkan.hpp"
-#include <memory>
 #include <vulkan/vulkan_raii.hpp>
 
 namespace Vulkan {
 GraphicsPipeline::GraphicsPipeline(
-    const Device &device,
+    const VulkanDevice &device,
     const SwapChain &myChain,
     const PipelineFixedFunctions &pipelineStates,
     const std::vector<PipelineShaderStage> shaderStages,
@@ -47,10 +46,10 @@ GraphicsPipeline::GraphicsPipeline(
       .pRasterizationState = pipelineStates.rasterizationState.GetCreateInfo(),
       .pMultisampleState = pipelineStates.multisampleState.GetCreateInfo(),
       .pDynamicState = &dynamicState,
-      .layout = *pipelineLayout.Handle(),
+      .layout = pipelineLayout.Handle(),
       .renderPass = nullptr,
   };
 
-  graphicsPipeline = std::make_unique<vk::raii::Pipeline>(*device.Handle(), nullptr, pipelineInfo);
+  graphicsPipeline = device.CreatePipeline(pipelineInfo);
 }
 } // namespace Vulkan

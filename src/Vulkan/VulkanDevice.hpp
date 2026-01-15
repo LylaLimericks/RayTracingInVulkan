@@ -34,6 +34,7 @@ public:
   vk::raii::Fence CreateFence(const vk::FenceCreateInfo &createInfo) const { return vk::raii::Fence(logicalDevice, createInfo); }
   vk::Result WaitForFences(const vk::ArrayProxy<const vk::Fence> &fences, vk::Bool32 waitAll, uint64_t timeout) const { return logicalDevice.waitForFences(fences, waitAll, timeout); };
   vk::raii::Queue CreateQueue(const uint32_t &queueIndex, const uint32_t &familyIndex) const { return vk::raii::Queue(logicalDevice, queueIndex, familyIndex); }
+  vk::raii::Pipeline CreatePipeline(const vk::GraphicsPipelineCreateInfo createInfo) const { return vk::raii::Pipeline(logicalDevice, nullptr, createInfo); }
 
 private:
   const std::vector<const char *> &enabledExtensions;

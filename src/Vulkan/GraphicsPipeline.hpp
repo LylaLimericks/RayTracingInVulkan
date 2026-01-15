@@ -1,7 +1,6 @@
 #ifndef GRAPHICS_PIPELINE_H
 #define GRAPHICS_PIPELINE_H
 
-#include <memory>
 #include <vector>
 #include <vulkan/vulkan_raii.hpp>
 namespace Vulkan {
@@ -15,7 +14,7 @@ class PipelineLayout;
 class GraphicsPipeline {
 public:
   GraphicsPipeline(const VulkanDevice &device, const SwapChain &swapChain, const PipelineFixedFunctions &pipelineStates, const std::vector<PipelineShaderStage> shaderStages, const PipelineLayout &pipelineLayout);
-  vk::raii::Pipeline *Handle() const { return graphicsPipeline.get(); }
+  const vk::Pipeline Handle() const { return graphicsPipeline; }
 
 private:
   const SwapChain &swapChain;
@@ -24,7 +23,7 @@ private:
   const PipelineFixedFunctions &pipelineStates;
   const PipelineLayout &pipelineLayout;
 
-  std::unique_ptr<vk::raii::Pipeline> graphicsPipeline;
+  vk::raii::Pipeline graphicsPipeline = nullptr;
 };
 
 } // namespace Vulkan

@@ -122,7 +122,7 @@ void Application::createSwapChain() {
   const auto fixedFunctions = GetFixedFunctions();
   const auto shaderStages = GetShaderStages();
   CreatePipelineLayout();
-  graphicsPipeline.reset(new GraphicsPipeline(*device, *swapChain, fixedFunctions, shaderStages, *pipelineLayout));
+  graphicsPipeline.reset(new GraphicsPipeline(*device.get(), *swapChain, fixedFunctions, shaderStages, *pipelineLayout));
 }
 
 PipelineFixedFunctions Application::GetFixedFunctions() {
