@@ -46,7 +46,7 @@ private:
 
   std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
   std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
-  vk::raii::Fence drawFence = nullptr;
+  std::vector<vk::raii::Fence> inFlightFences;
   uint32_t currentFrame = 0;
 };
 

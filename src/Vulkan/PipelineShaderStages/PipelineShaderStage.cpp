@@ -11,9 +11,11 @@ PipelineShaderStage::PipelineShaderStage(vk::ShaderStageFlagBits shaderStage, co
 vk::PipelineShaderStageCreateInfo PipelineShaderStage::GetCreateInfo() const {
   return vk::PipelineShaderStageCreateInfo{
       .stage = shaderStage,
-      .module = *shaderModule.Handle(),
+      .module = shaderModule.Handle(),
       .pName = pName.c_str(),
   };
 }
+
+PipelineShaderStage::~PipelineShaderStage() {}
 
 } // namespace Vulkan

@@ -14,11 +14,13 @@ public:
   ~VulkanDevice();
 
   const uint32_t GraphicsFamilyIndex() const { return graphicsFamilyIndex; }
+  const vk::Queue GraphicsQueue() const { return graphicsQueue; }
   const uint32_t PresentFamilyIndex() const { return presentFamilyIndex; }
+  const vk::Queue PresentQueue() const { return presentQueue; }
   vk::raii::CommandPool CreateCommandPool(const vk::CommandPoolCreateFlagBits createFlagBits, const uint32_t queueIndex);
 
-  std::vector<vk::raii::CommandBuffer> CreateCommandBuffers(const vk::CommandBufferLevel commandBufferLevel, const uint32_t &bufferCount);
-  std::vector<vk::raii::CommandBuffer> CreateCommandBuffers(const vk::CommandBufferLevel commandBufferLevel, const vk::CommandPool &commandPool, const uint32_t &bufferCount);
+  std::vector<vk::raii::CommandBuffer> CreateCommandBuffers(const vk::CommandBufferLevel &commandBufferLevel, const uint32_t &bufferCount);
+  std::vector<vk::raii::CommandBuffer> CreateCommandBuffers(const vk::CommandBufferLevel &commandBufferLevel, const vk::CommandPool &commandPool, const uint32_t &bufferCount);
 
   const vk::Device LogicalDevice() const { return logicalDevice; }
   explicit operator const vk::Device() const { return logicalDevice; }
@@ -35,6 +37,11 @@ public:
   vk::Result WaitForFences(const vk::ArrayProxy<const vk::Fence> &fences, vk::Bool32 waitAll, uint64_t timeout) const { return logicalDevice.waitForFences(fences, waitAll, timeout); };
   vk::raii::Queue CreateQueue(const uint32_t &queueIndex, const uint32_t &familyIndex) const { return vk::raii::Queue(logicalDevice, queueIndex, familyIndex); }
   vk::raii::Pipeline CreatePipeline(const vk::GraphicsPipelineCreateInfo createInfo) const { return vk::raii::Pipeline(logicalDevice, nullptr, createInfo); }
+
+  /****
+   * Duplicated Interfaces for vk::Device
+   ****/
+  void ResetFences(const vk::ArrayProxy<vk::Fence> &fences) { logicalDevice.resetFences(fences); }
 
 private:
   const std::vector<const char *> &enabledExtensions;

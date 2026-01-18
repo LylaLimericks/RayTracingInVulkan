@@ -8,7 +8,7 @@ namespace Vulkan {
 
 class VertexInputState : public FixedFunction<vk::PipelineVertexInputStateCreateInfo> {
 public:
-  VertexInputState(vk::PipelineVertexInputStateCreateInfo stateCreateInfo) : FixedFunction(stateCreateInfo){};
+  VertexInputState(const vk::PipelineVertexInputStateCreateInfo &stateCreateInfo) : FixedFunction(stateCreateInfo){};
 };
 } // namespace Vulkan
 

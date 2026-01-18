@@ -8,7 +8,7 @@ namespace Vulkan {
 
 class InputAssemblyState : public FixedFunction<vk::PipelineInputAssemblyStateCreateInfo> {
 public:
-  InputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo createInfo) : FixedFunction(createInfo){};
+  InputAssemblyState(const vk::PipelineInputAssemblyStateCreateInfo &createInfo) : FixedFunction(createInfo){};
 };
 } // namespace Vulkan
 

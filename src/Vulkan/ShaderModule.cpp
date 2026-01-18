@@ -26,6 +26,7 @@ std::vector<char> ShaderModule::ReadFromFile(const std::string &filename) {
     throw std::runtime_error("Failed to load shader file!");
   }
 
+  // TODO: Verify shader file gets cleaned up
   std::vector<char> buffer(shaderFile.tellg());
   shaderFile.seekg(0, std::ios::beg);
   shaderFile.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
@@ -33,5 +34,8 @@ std::vector<char> ShaderModule::ReadFromFile(const std::string &filename) {
 
   return buffer;
 }
+
+// TODO: Ensure that the open shader file gets cleaned up
+ShaderModule::~ShaderModule() {}
 
 } // namespace Vulkan

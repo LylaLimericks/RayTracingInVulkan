@@ -20,13 +20,17 @@ void RayTracingApplication::mainLoop() {
 }
 
 void RayTracingApplication::drawFrame() {
-  auto fenceResult = device->WaitForFences(*drawFence, vk::True, 999999);
+  auto fenceResult = device->WaitForFences(*inFlightFences[currentFrame], vk::True, 999999);
 
   auto [result, imageIndex] = swapChain->AcquireNextFrame(UINT64_MAX, *presentCompleteSemaphores[currentFrame]);
 
   if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR) {
     throw std::runtime_error("Failed to acquire swap chain image!");
   }
+
+  device->ResetFences(*inFlightFences[currentFrame]);
+  commandBuffers[currentFrame].reset();
+  recordCommandBuffer(currentFrame, imageIndex);
 
   vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
 
@@ -39,6 +43,13 @@ void RayTracingApplication::drawFrame() {
       .signalSemaphoreCount = 1,
       .pSignalSemaphores = &*renderFinishedSemaphores[imageIndex],
   };
+
+  device->GraphicsQueue().submit(submitInfo, inFlightFences[currentFrame]);
+  vk::PresentInfoKHR presentInfo = swapChain->GetPresentInfo(1, &*renderFinishedSemaphores[currentFrame], &imageIndex);
+
+  presentInfo.pResults = nullptr;
+
+  result = device->PresentQueue().presentKHR(presentInfo);
 }
 
 void RayTracingApplication::createSyncObjects() {
@@ -50,7 +61,9 @@ void RayTracingApplication::createSyncObjects() {
     renderFinishedSemaphores.emplace_back(device->CreateSemaphore(vk::SemaphoreCreateInfo()));
   }
 
-  drawFence = device->CreateFence({.flags = vk::FenceCreateFlagBits::eSignaled});
+  for (size_t i = 0; i < frameCount; i++) {
+    inFlightFences.emplace_back(device->CreateFence({.flags = vk::FenceCreateFlagBits::eSignaled}));
+  }
 }
 
 void RayTracingApplication::recordCommandBuffer(const size_t currentFrame, const uint32_t imageIndex) {

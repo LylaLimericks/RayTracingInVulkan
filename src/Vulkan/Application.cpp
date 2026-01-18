@@ -257,4 +257,6 @@ void Application::TransitionImageLayout(
   commandBuffers[currentFrame].pipelineBarrier2(dependencyInfo);
 }
 
+Application::~Application() {}
+
 } // namespace Vulkan

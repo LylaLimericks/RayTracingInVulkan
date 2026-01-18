@@ -2,9 +2,10 @@
 #define VERTEX_SHADER_STAGE_H
 
 #include "Vulkan//PipelineShaderStages/PipelineShaderStage.hpp"
-#include "Vulkan/ShaderModule.hpp"
 #include "vulkan/vulkan.hpp"
 namespace Vulkan {
+
+class ShaderModule;
 
 class VertexShaderStage : public PipelineShaderStage {
 public:

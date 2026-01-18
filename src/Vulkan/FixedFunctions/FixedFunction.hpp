@@ -6,12 +6,12 @@ namespace Vulkan {
 template <class StateCreateInfo>
 class FixedFunction {
 public:
-  virtual void SetCreateInfo(StateCreateInfo stateCreateInfo);
-  virtual StateCreateInfo *GetCreateInfo() const { return &createInfo; }
+  // virtual void SetCreateInfo(StateCreateInfo stateCreateInfo);
+  virtual const StateCreateInfo *GetCreateInfo() const { return &createInfo; }
 
 protected:
-  FixedFunction(StateCreateInfo stateCreateInfo) : createInfo(stateCreateInfo){};
-  StateCreateInfo createInfo;
+  FixedFunction(const StateCreateInfo &stateCreateInfo) : createInfo(stateCreateInfo){};
+  const StateCreateInfo createInfo;
 };
 } // namespace Vulkan
 

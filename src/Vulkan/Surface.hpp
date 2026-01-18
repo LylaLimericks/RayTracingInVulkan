@@ -10,18 +10,17 @@ class Instance;
 class Surface {
 public:
   Surface(const Instance &instance, const Window &window);
+  ~Surface();
 
-  const vk::raii::SurfaceKHR *Handle() const { return surface.get(); }
+  const vk::raii::SurfaceKHR *Handle() const { return &surface; }
 
   const class Window &Window() const { return window; }
   const class Instance &Instance() const { return instance; }
 
-  operator vk::SurfaceKHR() const { return *surface.get(); }
-
 private:
   const class Window &window;
   const class Instance &instance;
-  std::unique_ptr<vk::raii::SurfaceKHR> surface;
+  vk::raii::SurfaceKHR surface = nullptr;
 };
 
 } // namespace Vulkan

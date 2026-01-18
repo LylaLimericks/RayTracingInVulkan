@@ -96,4 +96,5 @@ const std::vector<vk::raii::PhysicalDevice> Instance::PhysicalDevices() const {
   return instance.enumeratePhysicalDevices();
 }
 
+// Instance::~Instance(){};
 } // namespace Vulkan

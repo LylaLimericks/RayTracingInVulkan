@@ -10,6 +10,7 @@ find_package(glm REQUIRED)
 find_package(Vulkan REQUIRED)
 add_library(VulkanCppModule INTERFACE)
 add_library(Vulkan::cppm ALIAS VulkanCppModule)
+target_link_libraries(VulkanCppModule INTERFACE Vulkan::Vulkan)
 
 target_compile_definitions(VulkanCppModule INTERFACE
   VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
@@ -20,8 +21,20 @@ add_library(Application)
 
 target_sources(Application
   PRIVATE
+    src/Vulkan/Application.cpp
+    src/Vulkan/GraphicsPipeline.cpp
+    src/Vulkan/ImageView.cpp
+    src/Vulkan/Instance.cpp
+    src/Vulkan/PipelineLayout.cpp
+    src/Vulkan/ShaderModule.cpp
+    src/Vulkan/Surface.cpp
+    src/Vulkan/SwapChain.cpp
+    src/Vulkan/VulkanDevice.cpp
+    src/Vulkan/Window.cpp
+    src/Vulkan/PipelineShaderStages/PipelineShaderStage.cpp
     src/RayTracingApplication.cpp
-    src/WindowManager.cpp
+    src/Vulkan/Surface.cpp
+    src/Vulkan/Window.cpp
 
   PUBLIC
     FILE_SET applicationHeaders
@@ -29,8 +42,31 @@ target_sources(Application
     BASE_DIRS
       src
     FILES
-      src/RayTracingApplication.hpp
-      src/WindowManager.hpp
+    src/Vulkan/Application.hpp
+    src/Vulkan/ApplicationInfo.hpp
+    src/Vulkan/GraphicsPipeline.hpp
+    src/Vulkan/ImageView.hpp
+    src/Vulkan/Instance.hpp
+    src/Vulkan/PipelineLayout.hpp
+    src/Vulkan/ShaderModule.hpp
+    src/Vulkan/Surface.hpp
+    src/Vulkan/SwapChain.hpp
+    src/Vulkan/Version.hpp
+    src/Vulkan/VulkanDevice.hpp
+    src/Vulkan/Window.hpp
+    src/Vulkan/WindowConfig.hpp
+    src/Vulkan/FixedFunctions/ColorBlendState.hpp
+    src/Vulkan/FixedFunctions/FixedFunction.hpp
+    src/Vulkan/FixedFunctions/InputAssemblyState.hpp
+    src/Vulkan/FixedFunctions/MultisampleState.hpp
+    src/Vulkan/FixedFunctions/PipelineFixedFunctions.hpp
+    src/Vulkan/FixedFunctions/RasterizationState.hpp
+    src/Vulkan/FixedFunctions/VertexInputState.hpp
+    src/Vulkan/FixedFunctions/ViewportState.hpp
+    src/Vulkan/PipelineShaderStages/FragmentShaderStage.hpp
+    src/Vulkan/PipelineShaderStages/PipelineShaderStage.hpp
+    src/Vulkan/PipelineShaderStages/VertexShaderStage.hpp
+    src/RayTracingApplication.hpp
 )
 
 target_compile_features(Application PRIVATE cxx_std_20)

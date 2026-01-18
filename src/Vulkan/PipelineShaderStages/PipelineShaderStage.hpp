@@ -9,6 +9,7 @@ class ShaderModule;
 class PipelineShaderStage {
 public:
   vk::PipelineShaderStageCreateInfo GetCreateInfo() const;
+  ~PipelineShaderStage();
 
 protected:
   PipelineShaderStage(vk::ShaderStageFlagBits shaderStage, const ShaderModule &shaderModule, const std::string &pName);

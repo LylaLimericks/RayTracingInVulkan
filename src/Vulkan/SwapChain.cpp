@@ -2,9 +2,8 @@
 #include "Vulkan/Surface.hpp"
 #include "Vulkan/VulkanDevice.hpp"
 #include "Vulkan/Window.hpp"
-#include "vulkan/vulkan.hpp"
-#include <memory>
-#include <vulkan/vulkan_core.h>
+// #include "vulkan/vulkan.hpp"
+// #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_raii.hpp>
 
 namespace Vulkan {

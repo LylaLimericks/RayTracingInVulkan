@@ -3,6 +3,8 @@
 
 #include "vulkan/vulkan.hpp"
 #include <vulkan/vulkan_raii.hpp>
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 namespace Vulkan {
 
 class VulkanDevice;
@@ -24,6 +26,10 @@ public:
   const size_t Size() const { return swapChainImages.size(); }
 
   vk::ResultValue<uint32_t> AcquireNextFrame(uint64_t timeout, vk::Semaphore semphore);
+  vk::raii::SwapchainKHR *Handle() { return &swapChain; }
+
+  // TODO: Fix the issue this is used to resolve, we should have to have this be an interface on the SwapChain class.
+  const vk::PresentInfoKHR GetPresentInfo(const uint32_t waitSemaphoreCount, const vk::Semaphore *pWaitSemaphores, const uint32_t *imageIndices) { return vk::PresentInfoKHR{.waitSemaphoreCount = waitSemaphoreCount, .pWaitSemaphores = pWaitSemaphores, .swapchainCount = 1, .pSwapchains = &*swapChain, .pImageIndices = imageIndices}; }
 
 private:
   const VulkanDevice &device;

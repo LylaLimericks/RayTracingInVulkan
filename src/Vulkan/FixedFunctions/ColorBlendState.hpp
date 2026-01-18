@@ -8,7 +8,7 @@ namespace Vulkan {
 
 class ColorBlendState : public FixedFunction<vk::PipelineColorBlendStateCreateInfo> {
 public:
-  ColorBlendState(vk::PipelineColorBlendStateCreateInfo stateCreateInfo) : FixedFunction(stateCreateInfo){};
+  ColorBlendState(const vk::PipelineColorBlendStateCreateInfo &stateCreateInfo) : FixedFunction(stateCreateInfo){};
 };
 } // namespace Vulkan
 

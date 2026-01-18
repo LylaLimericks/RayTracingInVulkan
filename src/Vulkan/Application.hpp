@@ -1,7 +1,6 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include "Vulkan/PipelineShaderStages/PipelineShaderStage.hpp"
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan_core.h>
@@ -16,6 +15,7 @@ class GraphicsPipeline;
 class SwapChain;
 class PipelineLayout;
 class PipelineFixedFunctions;
+class PipelineShaderStage;
 class ApplicationInfo;
 class WindowConfig;
 class ShaderModule;
@@ -24,6 +24,7 @@ class Application {
 public:
   Application(const ApplicationInfo &appInfo, const WindowConfig &windowConfig,
               vk::PresentModeKHR presentMode, bool enableValidationLayers);
+  ~Application();
 
   void setPhysicalDevice(VulkanDevice device);
   void initializeGraphicsPipeline();

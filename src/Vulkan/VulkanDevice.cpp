@@ -1,6 +1,5 @@
 #include "VulkanDevice.hpp"
 #include "vulkan/vulkan.hpp"
-#include <memory>
 #include <stdexcept>
 #include <vulkan/vulkan_raii.hpp>
 
@@ -104,7 +103,11 @@ vk::raii::CommandPool VulkanDevice::CreateCommandPool(const vk::CommandPoolCreat
   return vk::raii::CommandPool(logicalDevice, poolInfo);
 }
 
-std::vector<vk::raii::CommandBuffer> VulkanDevice::CreateCommandBuffers(const vk::CommandBufferLevel bufferLevel, const vk::CommandPool &commandPool, const uint32_t &bufferCount) {
+std::vector<vk::raii::CommandBuffer> VulkanDevice::CreateCommandBuffers(const vk::CommandBufferLevel &bufferLevel, const uint32_t &bufferCount) {
+  return CreateCommandBuffers(bufferLevel, commandPool, bufferCount);
+}
+
+std::vector<vk::raii::CommandBuffer> VulkanDevice::CreateCommandBuffers(const vk::CommandBufferLevel &bufferLevel, const vk::CommandPool &commandPool, const uint32_t &bufferCount) {
   vk::CommandBufferAllocateInfo allocInfo{
       .commandPool = commandPool,
       .level = bufferLevel,
@@ -113,5 +116,7 @@ std::vector<vk::raii::CommandBuffer> VulkanDevice::CreateCommandBuffers(const vk
 
   return vk::raii::CommandBuffers(logicalDevice, allocInfo);
 }
+
+VulkanDevice::~VulkanDevice() {}
 
 } // namespace Vulkan

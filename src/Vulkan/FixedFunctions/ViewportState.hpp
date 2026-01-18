@@ -8,7 +8,7 @@ namespace Vulkan {
 
 class ViewportState : public FixedFunction<vk::PipelineViewportStateCreateInfo> {
 public:
-  ViewportState(vk::PipelineViewportStateCreateInfo createInfo) : FixedFunction(createInfo){};
+  ViewportState(const vk::PipelineViewportStateCreateInfo &createInfo) : FixedFunction(createInfo){};
 };
 
 } // namespace Vulkan
