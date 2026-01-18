@@ -29,12 +29,12 @@ vk::raii::PhysicalDevice pickPhysicalDevice(const std::vector<vk::raii::Physical
 
   // Iterate through the devices to find a suitable candidate
   for (const auto &device : devices) {
-    const auto queueFamilies = device.getQueueFamilyProperties();
     bool isSuitable = device.getProperties().apiVersion >= VK_API_VERSION_1_3;
-
     if (!isSuitable) {
       continue;
     }
+
+    const auto queueFamilies = device.getQueueFamilyProperties();
 
     // Verify the existence of a queue family that supports graphics
     for (const auto &queueFamilyProps : queueFamilies) {
