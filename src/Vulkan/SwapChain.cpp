@@ -2,9 +2,6 @@
 #include "Vulkan/Surface.hpp"
 #include "Vulkan/VulkanDevice.hpp"
 #include "Vulkan/Window.hpp"
-// #include "vulkan/vulkan.hpp"
-// #include <vulkan/vulkan_core.h>
-#include <stdexcept>
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_raii.hpp>
 
