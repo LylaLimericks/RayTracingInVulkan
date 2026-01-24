@@ -43,4 +43,5 @@
 build/
 release/
 debug/
+debug-clang/
 .cache
