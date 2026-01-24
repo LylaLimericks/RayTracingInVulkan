@@ -17,6 +17,7 @@
 #include "Vulkan/VulkanDevice.hpp"
 #include "Window.hpp"
 #include "vulkan/vulkan.hpp"
+#include <algorithm>
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_raii.hpp>
 
@@ -29,38 +30,27 @@ vk::raii::PhysicalDevice pickPhysicalDevice(const std::vector<vk::raii::Physical
 
   // Iterate through the devices to find a suitable candidate
   for (const auto &device : devices) {
-    bool isSuitable = device.getProperties().apiVersion >= VK_API_VERSION_1_3;
-    if (!isSuitable) {
-      continue;
-    }
-
-    const auto queueFamilies = device.getQueueFamilyProperties();
+    bool supportsVulkan1_3 = device.getProperties().apiVersion >= VK_API_VERSION_1_3;
 
     // Verify the existence of a queue family that supports graphics
-    for (const auto &queueFamilyProps : queueFamilies) {
-      if ((queueFamilyProps.queueFlags & vk::QueueFlagBits::eGraphics) !=
-          static_cast<vk::QueueFlags>(0)) {
-        isSuitable = false;
-        break;
-      }
-    }
+    const auto queueFamilies = device.getQueueFamilyProperties();
+    bool supportsGraphics = std::ranges::any_of(queueFamilies, [](auto const &qfp) { return !!(qfp.queueFlags & vk::QueueFlagBits::eGraphics); });
 
     // Vertify that the device supports all required extensions
     auto extensions = device.enumerateDeviceExtensionProperties();
-    bool foundAllExtensions = true;
-    for (const auto &reqExtension : requiredExtensions) {
-      bool foundExtension = false;
-      for (const auto &extension : extensions) {
-        if (strcmp(extension.extensionName, reqExtension) == 0) {
-          foundExtension = true;
-          break;
-        }
-      }
-      foundAllExtensions = foundAllExtensions & foundExtension;
-    }
+    bool supportsAllRequiredExtensions =
+        std::ranges::all_of(requiredExtensions,
+                            [&extensions](auto const &reqDeviceExtension) {
+                              return std::ranges::any_of(extensions,
+                                                         [reqDeviceExtension](auto const &extension) {
+                                                           return strcmp(extension.extensionName, reqDeviceExtension) == 0;
+                                                         });
+                            });
 
-    isSuitable = isSuitable && foundAllExtensions;
-    if (isSuitable) {
+    auto features = device.getFeatures2<vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceVulkan13Features, vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>();
+    bool supportsRequiredFeatures = features.get<vk::PhysicalDeviceVulkan13Features>().dynamicRendering && features.get<vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>().extendedDynamicState;
+
+    if (supportsVulkan1_3 && supportsGraphics && supportsAllRequiredExtensions && supportsRequiredFeatures) {
       return device;
     }
   }
@@ -83,8 +73,8 @@ Application::Application(const ApplicationInfo &appInfo,
 
   window.reset(new Window(windowConfig));
   instance.reset(new Instance(*window, appInfo, validationLayers, enableValidationLayers));
-  pickDefaultPhysicalDevice();
   surface.reset(new Surface(*instance, *window));
+  pickDefaultPhysicalDevice();
   createSwapChain();
   frameCount = swapChain->Size();
   commandBuffers = device->CreateCommandBuffers(vk::CommandBufferLevel::ePrimary, frameCount);
