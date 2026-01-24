@@ -104,11 +104,11 @@ void Application::pickDefaultPhysicalDevice() {
 
   const vk::PhysicalDeviceFeatures deviceFeatures{};
   physicalDevice = pickedDevice;
-  device.reset(new VulkanDevice(pickedDevice, *surface->Handle(), deviceExtensions, deviceFeatures, &featureChain));
+  device.reset(new VulkanDevice(pickedDevice, surface->Handle(), deviceExtensions, deviceFeatures, &featureChain));
 }
 
 void Application::createSwapChain() {
-  swapChain.reset(new SwapChain(physicalDevice, *device.get(), *window.get(), *surface->Handle(), vk::PresentModeKHR::eMailbox));
+  swapChain.reset(new SwapChain(physicalDevice, *device.get(), *window.get(), surface.get()->Handle(), vk::PresentModeKHR::eMailbox));
   const auto fixedFunctions = GetFixedFunctions();
   const auto shaderStages = GetShaderStages();
   CreatePipelineLayout();

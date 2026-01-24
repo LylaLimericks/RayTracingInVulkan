@@ -12,7 +12,7 @@ public:
   Surface(const Instance &instance, const Window &window);
   ~Surface();
 
-  const vk::raii::SurfaceKHR *Handle() const { return &surface; }
+  vk::SurfaceKHR Handle() const { return surface; }
 
   const class Window &Window() const { return window; }
   const class Instance &Instance() const { return instance; }
