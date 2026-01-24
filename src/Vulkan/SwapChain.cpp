@@ -4,6 +4,8 @@
 #include "Vulkan/Window.hpp"
 // #include "vulkan/vulkan.hpp"
 // #include <vulkan/vulkan_core.h>
+#include <stdexcept>
+#include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_raii.hpp>
 
 namespace Vulkan {
@@ -11,7 +13,7 @@ namespace Vulkan {
 SwapChain::SwapChain(const vk::PhysicalDevice &physicalDevice, const VulkanDevice &device, const Window &window, const vk::SurfaceKHR &surface, vk::PresentModeKHR presentMode) : device(device) {
   const auto surfaceCapabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface);
 
-  surfaceFormat = chooseSwapSurfaceFormat(physicalDevice.getSurfaceFormatsKHR());
+  surfaceFormat = chooseSwapSurfaceFormat(physicalDevice.getSurfaceFormatsKHR(surface));
   extent = chooseSwapExtent(window, surfaceCapabilities);
 
   auto minImageCount = std::max(MAX_IMAGE_COUNT, surfaceCapabilities.minImageCount);
