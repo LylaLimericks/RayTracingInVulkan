@@ -1,6 +1,7 @@
 #include "Vulkan/Window.hpp"
 #include "Vulkan/WindowConfig.hpp"
 #include "vulkan/vulkan.hpp"
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <cstdint>
 #include <stdexcept>
@@ -15,6 +16,7 @@ Window::Window(const WindowConfig &config) : windowConfig(config) {
     throw(std::runtime_error("glfw doesn't support Vulkan!"));
   }
 
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
   window = glfwCreateWindow(config.Width, config.Height, config.Title.c_str(),
