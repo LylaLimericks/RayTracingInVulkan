@@ -10,7 +10,8 @@ namespace Vulkan {
 // TODO: Verify and/or Refactor this to utilize appropriate ownership mechanisms with smart pointers
 Surface::Surface(const class Instance &instance, const class Window &window) : instance(instance), window(window) {
   VkSurfaceKHR s;
-  if (glfwCreateWindowSurface(instance.Handle(), window.Handle(), nullptr, &s) != 0) {
+  const auto ret = glfwCreateWindowSurface(instance.Handle(), window.Handle(), nullptr, &s);
+  if (ret != 0) {
     throw std::runtime_error("Failed initializing a window surface!");
   }
 
