@@ -9,6 +9,8 @@ namespace Vulkan {
 class MultiSampleState : public FixedFunction<vk::PipelineMultisampleStateCreateInfo> {
 public:
   MultiSampleState(const vk::PipelineMultisampleStateCreateInfo &stateCreateInfo) : FixedFunction(stateCreateInfo){};
+
+  using FixedFunction<vk::PipelineMultisampleStateCreateInfo>::GetCreateInfo;
 };
 } // namespace Vulkan
 #endif

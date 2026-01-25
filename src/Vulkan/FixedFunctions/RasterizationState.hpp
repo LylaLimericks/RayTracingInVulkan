@@ -9,6 +9,8 @@ namespace Vulkan {
 class RasterizationState : public FixedFunction<vk::PipelineRasterizationStateCreateInfo> {
 public:
   RasterizationState(const vk::PipelineRasterizationStateCreateInfo &stateCreateInfo) : FixedFunction(stateCreateInfo){};
+
+  using FixedFunction<vk::PipelineRasterizationStateCreateInfo>::GetCreateInfo;
 };
 } // namespace Vulkan
 #endif
