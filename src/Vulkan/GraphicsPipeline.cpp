@@ -16,11 +16,6 @@ GraphicsPipeline::GraphicsPipeline(
     const PipelineLayout &pipelineLayout)
     : device(device), swapChain(myChain), pipelineStates(pipelineStates), shaderStages(shaderStages), pipelineLayout(pipelineLayout) {
 
-  vk::PipelineRenderingCreateInfo pipelineRenderingCreateInfo{
-      .colorAttachmentCount = 1,
-      .pColorAttachmentFormats = swapChain.pFormat(),
-  };
-
   vk::PipelineShaderStageCreateInfo shaderStagesCreateInfo[shaderStages.size()];
   for (int i = 0; i < shaderStages.size(); i++) {
     shaderStagesCreateInfo[i] = shaderStages[i].GetCreateInfo();
@@ -37,7 +32,6 @@ GraphicsPipeline::GraphicsPipeline(
   };
 
   vk::GraphicsPipelineCreateInfo pipelineInfo{
-      .pNext = &pipelineRenderingCreateInfo,
       .stageCount = static_cast<uint32_t>(shaderStages.size()),
       .pStages = shaderStagesCreateInfo,
       .pVertexInputState = pipelineStates.vertexInputState.GetCreateInfo(),
