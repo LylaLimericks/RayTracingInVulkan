@@ -92,19 +92,19 @@ void Application::pickDefaultPhysicalDevice() {
   const auto pickedDevice = pickPhysicalDevice(devices, deviceExtensions);
 
   vk::StructureChain<vk::PhysicalDeviceFeatures2,
+                     vk::PhysicalDeviceVulkan11Features,
                      vk::PhysicalDeviceVulkan13Features,
                      vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>
       featureChain = {
           {}, // vk::PhysicalDeviceFeatures2 (leaving empty for now)
-          {.dynamicRendering =
-               true}, // Enable dynamic rendering from Vulkan 1.3
-          {.extendedDynamicState =
-               true} // Enable extended dynamic state from the extension.
+          {.shaderDrawParameters = true},
+          {.dynamicRendering = true},    // Enable dynamic rendering from Vulkan 1.3
+          {.extendedDynamicState = true} // Enable extended dynamic state from the extension.
       };
 
   const vk::PhysicalDeviceFeatures deviceFeatures{};
   physicalDevice = pickedDevice;
-  device.reset(new VulkanDevice(pickedDevice, surface->Handle(), deviceExtensions, deviceFeatures, &featureChain));
+  device.reset(new VulkanDevice(pickedDevice, surface->Handle(), deviceExtensions, deviceFeatures, &featureChain.get<vk::PhysicalDeviceFeatures2>()));
 }
 
 void Application::createSwapChain() {
