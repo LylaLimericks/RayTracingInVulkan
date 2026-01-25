@@ -72,26 +72,28 @@ target_sources(Application
 target_compile_features(Application PRIVATE cxx_std_20)
 target_compile_definitions(Application PRIVATE VULKAN_HPP_NO_STRUCT_CONSTRUCTORS)
 
-# add_library(VulkanRT)
-
-# file (GLOB VULKAN_RT_SOURCES src/Vulkan/*.cpp)
-
-# file (GLOB VULKAN_RT_HEADERS src/Vulkan/*.hpp)
-
-# target_sources(VulkanRT
-#   PRIVATE
-#     ${VULKAN_RT_SOURCES}
-
-#   PUBLIC
-#     FILE_SET vulkanRtHeaders
-#     TYPE HEADERS
-#     BASE_DIRS
-#       src/Vulkan
-#     FILES
-#       ${VULKAN_RT_HEADERS}
-# )
+find_program(SLANGC_EXECUTABLE slangc HINTS $ENV{VULKAN_SDK}/bin REQUIRED)
+function (add_slang_shader_target TARGET)
+        cmake_parse_arguments("SHADER" "" "" "SOURCES" ${ARGN})
+        set(SHADERS_DIR shaders)
+        set (ENTRY_POINTS -entry vertMain -entry fragMain)
+        add_custom_command(
+                OUTPUT ${SHADERS_DIR}
+                COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADERS_DIR}
+        )
+        add_custom_command(
+                OUTPUT ${SHADERS_DIR}/slang.spv
+                COMMAND ${SLANGC_EXECUTABLE} ${SHADER_SOURCES} -target spirv -profile spirv_1_4 -emit-spirv-directly -fvk-use-entrypoint-name ${ENTRY_POINTS} -o slang.spv
+                WORKING_DIRECTORY ${SHADERS_DIR}
+                DEPENDS ${SHADERS_DIR} ${SHADER_SOURCES}
+                COMMENT "Compiling Slang Shaders..."
+                VERBATIM
+        )
+        add_custom_target(${TARGET} DEPENDS ${SHADERS_DIR}/slang.spv)
+endfunction()
 
 add_executable(RayTracer)
+file (GLOB SHADER_SLANG_SOURCES src/shaders/*.slang)
 
 target_sources(RayTracer
   PRIVATE
@@ -105,6 +107,9 @@ target_link_libraries(RayTracer
     glfw
     # VulkanRT
 )
+
+add_slang_shader_target(shaders SOURCES ${SHADER_SLANG_SOURCES})
+add_dependencies(RayTracer shaders)
 
 target_compile_features(RayTracer PRIVATE cxx_std_20)
 
