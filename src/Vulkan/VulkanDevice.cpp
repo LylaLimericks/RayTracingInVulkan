@@ -8,7 +8,6 @@ namespace Vulkan {
 VulkanDevice::VulkanDevice(vk::raii::PhysicalDevice physicalDevice,
                            const vk::SurfaceKHR &surface,
                            const std::vector<const char *> &enabledExtensions,
-                           const vk::PhysicalDeviceFeatures &deviceFeatures,
                            void *nextDeviceFeatures)
     : physicalDevice(physicalDevice), enabledExtensions(enabledExtensions) {
 
@@ -85,7 +84,7 @@ VulkanDevice::VulkanDevice(vk::raii::PhysicalDevice physicalDevice,
       .pQueueCreateInfos = queueCreateInfos.data(),
       .enabledExtensionCount = static_cast<uint32_t>(enabledExtensions.size()),
       .ppEnabledExtensionNames = enabledExtensions.data(),
-      .pEnabledFeatures = &deviceFeatures,
+      // .pEnabledFeatures = &deviceFeatures,
   };
 
   logicalDevice = vk::raii::Device(physicalDevice, deviceCreateInfo);

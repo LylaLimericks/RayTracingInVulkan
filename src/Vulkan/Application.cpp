@@ -104,7 +104,7 @@ void Application::pickDefaultPhysicalDevice() {
 
   const vk::PhysicalDeviceFeatures deviceFeatures{};
   physicalDevice = pickedDevice;
-  device.reset(new VulkanDevice(pickedDevice, surface->Handle(), deviceExtensions, deviceFeatures, &featureChain.get<vk::PhysicalDeviceFeatures2>()));
+  device.reset(new VulkanDevice(pickedDevice, surface->Handle(), deviceExtensions, &featureChain.get<vk::PhysicalDeviceFeatures2>()));
 }
 
 void Application::createSwapChain() {

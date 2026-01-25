@@ -9,7 +9,6 @@ public:
   VulkanDevice(vk::raii::PhysicalDevice physicalDevice,
                const vk::SurfaceKHR &surface,
                const std::vector<const char *> &enabledExtensions,
-               const vk::PhysicalDeviceFeatures &deviceFeatures,
                void *nextDeviceFeatures);
   ~VulkanDevice();
 
