@@ -98,8 +98,8 @@ void Application::pickDefaultPhysicalDevice() {
       featureChain = {
           {}, // vk::PhysicalDeviceFeatures2 (leaving empty for now)
           {.shaderDrawParameters = true},
-          {.dynamicRendering = true},    // Enable dynamic rendering from Vulkan 1.3
-          {.extendedDynamicState = true} // Enable extended dynamic state from the extension.
+          {.synchronization2 = true, .dynamicRendering = true}, // Enable dynamic rendering from Vulkan 1.3
+          {.extendedDynamicState = true}                        // Enable extended dynamic state from the extension.
       };
 
   const vk::PhysicalDeviceFeatures deviceFeatures{};
