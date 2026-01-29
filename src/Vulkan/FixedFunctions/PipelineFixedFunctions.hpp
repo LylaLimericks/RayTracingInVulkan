@@ -11,12 +11,12 @@
 namespace Vulkan {
 
 struct PipelineFixedFunctions {
-  const ColorBlendState &colorBlendState;
-  const InputAssemblyState &inputAssemblyState;
-  const MultiSampleState &multisampleState;
-  const RasterizationState &rasterizationState;
-  const VertexInputState &vertexInputState;
-  const ViewportState &viewportState;
+  const ColorBlendState colorBlendState;
+  const InputAssemblyState inputAssemblyState;
+  const MultiSampleState multisampleState;
+  const RasterizationState rasterizationState;
+  const VertexInputState vertexInputState;
+  const ViewportState viewportState;
 };
 } // namespace Vulkan
 

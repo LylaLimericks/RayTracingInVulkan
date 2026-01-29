@@ -10,6 +10,7 @@
 namespace Implementations {
 
 void RayTracingApplication::run() {
+  mainLoop();
 }
 
 void RayTracingApplication::mainLoop() {

@@ -14,7 +14,7 @@ public:
   ShaderModule(const VulkanDevice &device, const std::vector<char> &code);
   ~ShaderModule();
 
-  vk::ShaderModule Handle() const { return shaderModule; }
+  const vk::ShaderModule Handle() const { return shaderModule; }
 
 private:
   const class VulkanDevice &device;

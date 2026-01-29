@@ -2,11 +2,12 @@
 #define FRAGMENT_SHADER_STAGE_H
 
 #include "Vulkan/PipelineShaderStages/PipelineShaderStage.hpp"
+#include <memory>
 namespace Vulkan {
 
 class FragmentShaderStage : public PipelineShaderStage {
 public:
-  FragmentShaderStage(const class ShaderModule &shaderModule, const std::string &pName) : PipelineShaderStage(vk::ShaderStageFlagBits::eFragment, shaderModule, pName){};
+  FragmentShaderStage(std::shared_ptr<ShaderModule> shaderModule, const std::string &pName) : PipelineShaderStage(vk::ShaderStageFlagBits::eFragment, shaderModule, pName){};
 };
 
 } // namespace Vulkan

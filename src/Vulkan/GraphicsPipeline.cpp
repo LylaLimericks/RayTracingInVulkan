@@ -31,19 +31,25 @@ GraphicsPipeline::GraphicsPipeline(
       .pDynamicStates = dynamicStates.data(),
   };
 
-  vk::GraphicsPipelineCreateInfo pipelineInfo{
-      .stageCount = static_cast<uint32_t>(shaderStages.size()),
-      .pStages = shaderStagesCreateInfo,
-      .pVertexInputState = pipelineStates.vertexInputState.GetCreateInfo(),
-      .pInputAssemblyState = pipelineStates.inputAssemblyState.GetCreateInfo(),
-      .pViewportState = pipelineStates.viewportState.GetCreateInfo(),
-      .pRasterizationState = pipelineStates.rasterizationState.GetCreateInfo(),
-      .pMultisampleState = pipelineStates.multisampleState.GetCreateInfo(),
-      .pDynamicState = &dynamicState,
-      .layout = pipelineLayout.Handle(),
-      .renderPass = nullptr,
-  };
+  vk::StructureChain<vk::GraphicsPipelineCreateInfo, vk::PipelineRenderingCreateInfo> pipelineInfo{
+      {
+          .stageCount = static_cast<uint32_t>(shaderStages.size()),
+          .pStages = shaderStagesCreateInfo,
+          .pVertexInputState = pipelineStates.vertexInputState.GetCreateInfo(),
+          .pInputAssemblyState = pipelineStates.inputAssemblyState.GetCreateInfo(),
+          .pViewportState = pipelineStates.viewportState.GetCreateInfo(),
+          .pRasterizationState = pipelineStates.rasterizationState.GetCreateInfo(),
+          .pMultisampleState = pipelineStates.multisampleState.GetCreateInfo(),
+          .pColorBlendState = pipelineStates.colorBlendState.GetCreateInfo(),
+          .pDynamicState = &dynamicState,
+          .layout = pipelineLayout.Handle(),
+          .renderPass = nullptr,
+      },
+      {
+          .colorAttachmentCount = 1,
+          .pColorAttachmentFormats = swapChain.pFormat(),
+      }};
 
-  graphicsPipeline = device.CreatePipeline(pipelineInfo);
+  graphicsPipeline = device.CreatePipeline(pipelineInfo.get<vk::GraphicsPipelineCreateInfo>());
 }
 } // namespace Vulkan

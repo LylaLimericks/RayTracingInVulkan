@@ -110,7 +110,13 @@ void Application::pickDefaultPhysicalDevice() {
 void Application::createSwapChain() {
   swapChain.reset(new SwapChain(physicalDevice, *device.get(), *window.get(), surface.get()->Handle(), vk::PresentModeKHR::eMailbox));
   const auto fixedFunctions = GetFixedFunctions();
-  const auto shaderStages = GetShaderStages();
+  shaderModule.reset(new ShaderModule(*device.get(), ShaderModules[0]));
+
+  VertexShaderStage vertShader(shaderModule, "vertMain");
+  FragmentShaderStage fragShader(shaderModule, "fragMain");
+
+  shaderStages.push_back(vertShader);
+  shaderStages.push_back(fragShader);
   CreatePipelineLayout();
   graphicsPipeline.reset(new GraphicsPipeline(*device.get(), *swapChain, fixedFunctions, shaderStages, *pipelineLayout));
 }
@@ -196,20 +202,6 @@ void Application::CreatePipelineLayout() {
   };
 
   pipelineLayout.reset(new PipelineLayout(*device.get(), pipelineLayoutInfo));
-}
-
-std::vector<PipelineShaderStage> Application::GetShaderStages() {
-  ShaderModule shaderModule(*device.get(), ShaderModules[0]);
-
-  VertexShaderStage vertShader(shaderModule, "vertMain");
-  FragmentShaderStage fragShader(shaderModule, "fragMain");
-
-  std::vector<PipelineShaderStage> ret{
-      vertShader,
-      fragShader,
-  };
-
-  return ret;
 }
 
 void Application::TransitionImageLayout(

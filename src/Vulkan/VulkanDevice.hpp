@@ -29,13 +29,13 @@ public:
    *****/
   vk::raii::SwapchainKHR CreateSwapChain(const vk::SwapchainCreateInfoKHR &createInfo) const { return vk::raii::SwapchainKHR(logicalDevice, createInfo); };
   vk::raii::ImageView CreateImageView(const vk::ImageViewCreateInfo &createInfo) const { return vk::raii::ImageView(logicalDevice, createInfo); }
-  vk::raii::ShaderModule CreateShaderModule(const vk::ShaderModuleCreateInfo &createInfo) const { return vk::raii::ShaderModule(logicalDevice, createInfo); };
+  [[nodiscard]] vk::raii::ShaderModule CreateShaderModule(const vk::ShaderModuleCreateInfo &createInfo) const { return vk::raii::ShaderModule{logicalDevice, createInfo}; };
   vk::raii::PipelineLayout CreatePipelineLayout(const vk::PipelineLayoutCreateInfo &createInfo) const { return vk::raii::PipelineLayout(logicalDevice, createInfo); }
   vk::raii::Semaphore CreateSemaphore(const vk::SemaphoreCreateInfo &createInfo) const { return vk::raii::Semaphore(logicalDevice, createInfo); }
   vk::raii::Fence CreateFence(const vk::FenceCreateInfo &createInfo) const { return vk::raii::Fence(logicalDevice, createInfo); }
   vk::Result WaitForFences(const vk::ArrayProxy<const vk::Fence> &fences, vk::Bool32 waitAll, uint64_t timeout) const { return logicalDevice.waitForFences(fences, waitAll, timeout); };
   vk::raii::Queue CreateQueue(const uint32_t &queueIndex, const uint32_t &familyIndex) const { return vk::raii::Queue(logicalDevice, queueIndex, familyIndex); }
-  vk::raii::Pipeline CreatePipeline(const vk::GraphicsPipelineCreateInfo createInfo) const { return vk::raii::Pipeline(logicalDevice, nullptr, createInfo); }
+  vk::raii::Pipeline CreatePipeline(const vk::GraphicsPipelineCreateInfo &createInfo) const { return vk::raii::Pipeline(logicalDevice, nullptr, createInfo); }
 
   /****
    * Duplicated Interfaces for vk::Device

@@ -56,6 +56,7 @@ protected:
   std::unique_ptr<GraphicsPipeline> graphicsPipeline;
   std::unique_ptr<SwapChain> swapChain;
   std::unique_ptr<PipelineLayout> pipelineLayout;
+  std::shared_ptr<ShaderModule> shaderModule;
   std::vector<PipelineShaderStage> shaderStages;
   std::vector<vk::raii::CommandBuffer> commandBuffers;
 
@@ -66,7 +67,6 @@ protected:
 
   void pickDefaultPhysicalDevice();
   PipelineFixedFunctions GetFixedFunctions();
-  std::vector<PipelineShaderStage> GetShaderStages();
   void CreatePipelineLayout();
 };
 } // namespace Vulkan
