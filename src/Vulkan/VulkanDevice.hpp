@@ -41,6 +41,7 @@ public:
    * Duplicated Interfaces for vk::Device
    ****/
   void ResetFences(const vk::ArrayProxy<vk::Fence> &fences) { logicalDevice.resetFences(fences); }
+  void WaitIdle() { logicalDevice.waitIdle(); }
 
 private:
   const std::vector<const char *> &enabledExtensions;
