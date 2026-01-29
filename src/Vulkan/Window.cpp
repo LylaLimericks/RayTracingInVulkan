@@ -45,7 +45,7 @@ vk::Extent2D Window::FramebufferSize() const {
 }
 
 bool Window::shouldClose() const {
-  bool ret = !glfwWindowShouldClose(window);
+  bool ret = glfwWindowShouldClose(window);
   return ret;
 }
 
