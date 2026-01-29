@@ -10,6 +10,7 @@
 namespace Implementations {
 
 void RayTracingApplication::run() {
+  createSyncObjects();
   mainLoop();
 }
 
@@ -18,6 +19,8 @@ void RayTracingApplication::mainLoop() {
     window->pollEvents();
     drawFrame();
   }
+
+  device->WaitIdle();
 }
 
 void RayTracingApplication::drawFrame() {
@@ -98,7 +101,7 @@ void RayTracingApplication::recordCommandBuffer(const size_t currentFrame, const
 
   commandBuffers[currentFrame].beginRendering(renderingInfo);
 
-  commandBuffers[currentFrame].bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline.get()->Handle());
+  commandBuffers[currentFrame].bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline->Handle());
   commandBuffers[currentFrame].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(swapChain->Extent().width), static_cast<float>(swapChain->Extent().height), 0.0f, 1.0f));
   commandBuffers[currentFrame].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), swapChain->Extent()));
 
