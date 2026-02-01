@@ -408,4 +408,21 @@ void Application::createCommandBuffers() {
   };
   commandBuffers = vk::raii::CommandBuffers(device, allocInfo);
 }
+
+void Application::createSyncObjects() {
+  presentCompleteSemaphores.clear();
+  renderFinishedSemaphores.clear();
+  inFlightFences.clear();
+
+  for (size_t i = 0; i < swapChainImages.size(); i++) {
+    presentCompleteSemaphores.emplace_back(device, vk::SemaphoreCreateInfo());
+    renderFinishedSemaphores.emplace_back(device, vk::SemaphoreCreateInfo());
+  }
+
+  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+    inFlightFences.emplace_back(
+        device,
+        vk::FenceCreateInfo{.flags = vk::FenceCreateFlagBits::eSignaled});
+  }
+}
 } // namespace Vulkan
