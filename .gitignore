@@ -41,5 +41,7 @@
 *.dwo
 
 build/
-
-*.ppm
+release/
+debug/
+debug-clang/
+.cache

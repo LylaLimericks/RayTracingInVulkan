@@ -4,16 +4,67 @@
 # See README.md for guidance.
 #---------------------------------------------------------------------------------------------------
 
-cmake_minimum_required ( VERSION 3.1.0...4.0.0 )
+cmake_minimum_required ( VERSION 3.2.9...4.0.0 )
 
-project ( RTWeekend LANGUAGES CXX )
+project ( VulkanRayTracing LANGUAGES CXX )
+
+list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/CMake")
+
+find_package(Vulkan REQUIRED)
+find_package(glfw3 REQUIRED)
+find_package(glm REQUIRED)
+
+set(STB_INCLUDEDIR ${std_INCLUDE_DIRS})
+
+add_library(VulkanCppModule INTERFACE)
+add_library(Vulkan::cppm ALIAS VulkanCppModule)
+target_link_libraries(VulkanCppModule INTERFACE Vulkan::Vulkan)
 
 # Set to C++11
 set ( CMAKE_CXX_STANDARD          11 )
 set ( CMAKE_CXX_STANDARD_REQUIRED ON )
 set ( CMAKE_CXX_EXTENSIONS        OFF )
 
+add_library(Application)
+
+target_sources(Application
+  PRIVATE
+    src/Vulkan/application.cpp
+    
+  PUBLIC
+    FILE_SET applicationHeaders
+    TYPE HEADERS
+    BASE_DIRS
+      src
+    FILES
+      src/Vulkan/application.hpp
+)
+
+target_compile_features(Application PRIVATE cxx_std_20)
+target_compile_definitions(Application PRIVATE VULKAN_HPP_NO_STRUCT_CONSTRUCTORS)
+
+find_program(SLANGC_EXECUTABLE slangc HINTS $ENV{VULKAN_SDK}/bin REQUIRED)
+function (add_slang_shader_target TARGET)
+        cmake_parse_arguments("SHADER" "" "" "SOURCES" ${ARGN})
+        set(SHADERS_DIR shaders)
+        set (ENTRY_POINTS -entry vertMain -entry fragMain)
+        add_custom_command(
+                OUTPUT ${SHADERS_DIR}
+                COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADERS_DIR}
+        )
+        add_custom_command(
+                OUTPUT ${SHADERS_DIR}/slang.spv
+                COMMAND ${SLANGC_EXECUTABLE} ${SHADER_SOURCES} -target spirv -profile spirv_1_4 -emit-spirv-directly -fvk-use-entrypoint-name ${ENTRY_POINTS} -o slang.spv
+                WORKING_DIRECTORY ${SHADERS_DIR}
+                DEPENDS ${SHADERS_DIR} ${SHADER_SOURCES}
+                COMMENT "Compiling Slang Shaders..."
+                VERBATIM
+        )
+        add_custom_target(${TARGET} DEPENDS ${SHADERS_DIR}/slang.spv)
+endfunction()
+
 # Source
+
 
 set ( EXTERNAL
   src/external/stb_image.h
@@ -107,6 +158,13 @@ endif()
 
 # Executables
 add_executable(inOneWeekend      ${EXTERNAL} ${SOURCE_ONE_WEEKEND})
+
+target_link_libraries(inOneWeekend
+  PRIVATE
+    Vulkan::cppm
+    Application
+    glfw
+)
 # add_executable(theNextWeek       ${EXTERNAL} ${SOURCE_NEXT_WEEK})
 # add_executable(theRestOfYourLife ${EXTERNAL} ${SOURCE_REST_OF_YOUR_LIFE})
 # add_executable(cos_cubed         src/TheRestOfYourLife/cos_cubed.cc         )
