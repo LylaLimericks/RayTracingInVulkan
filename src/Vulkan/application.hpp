@@ -67,12 +67,12 @@ private:
   void createCommandBuffers();
   void createSyncObjects();
 
-  void transition_image_layout(uint32_t imageIndex, vk::ImageLayout old_layout,
-                               vk::ImageLayout new_layout,
-                               vk::AccessFlags2 src_access_mask,
-                               vk::AccessFlags2 dst_access_mask,
-                               vk::PipelineStageFlags2 src_stage_mask,
-                               vk::PipelineStageFlags2 dst_stage_mask);
+  void transitionImageLayout(uint32_t imageIndex, vk::ImageLayout oldLayout,
+                             vk::ImageLayout newLayout,
+                             vk::AccessFlags2 srcAccessMask,
+                             vk::AccessFlags2 dstAccessMask,
+                             vk::PipelineStageFlags2 srcStageMask,
+                             vk::PipelineStageFlags2 dstStageMask);
 
   void recordCommandBuffer(uint32_t imageIndex);
   void drawFrame();
