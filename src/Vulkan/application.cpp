@@ -399,4 +399,13 @@ void Application::createCommandPool() {
   };
   commandPool = vk::raii::CommandPool(device, poolInfo);
 }
+
+void Application::createCommandBuffers() {
+  vk::CommandBufferAllocateInfo allocInfo{
+      .commandPool = commandPool,
+      .level = vk::CommandBufferLevel::ePrimary,
+      .commandBufferCount = MAX_FRAMES_IN_FLIGHT,
+  };
+  commandBuffers = vk::raii::CommandBuffers(device, allocInfo);
+}
 } // namespace Vulkan
