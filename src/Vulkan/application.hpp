@@ -35,8 +35,8 @@ private:
   vk::raii::CommandPool commandPool = nullptr;
   std::vector<vk::raii::CommandBuffer> commandBuffers;
 
-  std::vector<vk::raii::Semaphore> presentCompleteSemaphote;
-  std::vector<vk::raii::Semaphore> renderFinishedSemaphore;
+  std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
+  std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
   std::vector<vk::raii::Fence> inFlightFences;
   uint32_t semaphoreIndex = 0;
   uint32_t currentFrame = 0;
