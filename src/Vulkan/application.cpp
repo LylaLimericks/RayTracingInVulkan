@@ -392,4 +392,11 @@ void Application::createGraphicsPipeline() {
       pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
 };
 
+void Application::createCommandPool() {
+  vk::CommandPoolCreateInfo poolInfo{
+      .flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+      .queueFamilyIndex = queueIndex,
+  };
+  commandPool = vk::raii::CommandPool(device, poolInfo);
+}
 } // namespace Vulkan
