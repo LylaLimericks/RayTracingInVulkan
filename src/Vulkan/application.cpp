@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -504,5 +505,55 @@ void Application::recordCommandBuffer(uint32_t imageIndex) {
                         vk::PipelineStageFlagBits2::eBottomOfPipe);
 
   commandBuffers[currentFrame].end();
+}
+
+void Application::drawFrame() {
+  while (
+      vk::Result::eTimeout ==
+      device.waitForFences(*inFlightFences[currentFrame], vk::True, UINT64_MAX))
+    ;
+
+  auto [result, imageIndex] = swapChain.acquireNextImage(
+      UINT64_MAX, *presentCompleteSemaphores[semaphoreIndex], nullptr);
+
+  device.resetFences(*inFlightFences[currentFrame]);
+  commandBuffers[currentFrame].reset();
+  recordCommandBuffer(imageIndex);
+
+  vk::PipelineStageFlags waitDestinationStageMask(
+      vk::PipelineStageFlagBits::eColorAttachmentOutput);
+  const vk::SubmitInfo submitInfo{
+      .waitSemaphoreCount = 1,
+      .pWaitSemaphores = &*presentCompleteSemaphores[semaphoreIndex],
+      .pWaitDstStageMask = &waitDestinationStageMask,
+      .commandBufferCount = 1,
+      .pCommandBuffers = &*commandBuffers[currentFrame],
+      .signalSemaphoreCount = 1,
+      .pSignalSemaphores = &*renderFinishedSemaphores[imageIndex],
+  };
+  queue.submit(submitInfo, *inFlightFences[currentFrame]);
+
+  const vk::PresentInfoKHR presentInfoKHR{
+      .waitSemaphoreCount = 1,
+      .pWaitSemaphores = &*renderFinishedSemaphores[imageIndex],
+      .swapchainCount = 1,
+      .pSwapchains = &*swapChain,
+      .pImageIndices = &imageIndex,
+  };
+
+  result = queue.presentKHR(presentInfoKHR);
+
+  switch (result) {
+  case vk::Result::eSuccess:
+    break;
+  case vk::Result::eSuboptimalKHR:
+    std::cout << "vk::Queue::presentKHR return vk::Result::eSuboptimalKHR !\n";
+    break;
+  default:
+    break;
+  }
+
+  semaphoreIndex = (semaphoreIndex + 1) % presentCompleteSemaphores.size();
+  currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 } // namespace Vulkan
