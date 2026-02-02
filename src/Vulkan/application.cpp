@@ -459,4 +459,50 @@ void Application::transitionImageLayout(uint32_t imageIndex,
 
   commandBuffers[currentFrame].pipelineBarrier2(dependencyInfo);
 }
+
+void Application::recordCommandBuffer(uint32_t imageIndex) {
+  commandBuffers[currentFrame].begin({});
+
+  // Before starting to render, transition swapchain image to
+  // COLOR_ATTACHMENT_OPTIMAL
+  transitionImageLayout(imageIndex, vk::ImageLayout::eUndefined,
+                        vk::ImageLayout::eColorAttachmentOptimal, {},
+                        vk::AccessFlagBits2::eColorAttachmentWrite,
+                        vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+                        vk::PipelineStageFlagBits2::eColorAttachmentOutput);
+
+  vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 1.0f);
+  vk::RenderingAttachmentInfo attachmentInfo = {
+      .imageView = swapChainImageViews[imageIndex],
+      .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+      .loadOp = vk::AttachmentLoadOp::eClear,
+      .storeOp = vk::AttachmentStoreOp::eStore,
+      .clearValue = clearColor,
+  };
+
+  vk::RenderingInfo renderingInfo = {
+      .renderArea = {.offset = {0, 0}, .extent = swapChainExtent},
+      .layerCount = 1,
+      .colorAttachmentCount = 1,
+      .pColorAttachments = &attachmentInfo,
+  };
+  commandBuffers[currentFrame].beginRendering(renderingInfo);
+  commandBuffers[currentFrame].bindPipeline(vk::PipelineBindPoint::eGraphics,
+                                            *graphicsPipeline);
+  commandBuffers[currentFrame].setViewport(
+      0, vk::Viewport(0.0f, 0.0f, static_cast<float>(swapChainExtent.width),
+                      static_cast<float>(swapChainExtent.height), 0.0f, 1.0f));
+  commandBuffers[currentFrame].setScissor(
+      0, vk::Rect2D(vk::Offset2D(0, 0), swapChainExtent));
+  commandBuffers[currentFrame].draw(3, 1, 0, 0);
+  commandBuffers[currentFrame].endRendering();
+
+  transitionImageLayout(imageIndex, vk::ImageLayout::eColorAttachmentOptimal,
+                        vk::ImageLayout::ePresentSrcKHR,
+                        vk::AccessFlagBits2::eColorAttachmentWrite, {},
+                        vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+                        vk::PipelineStageFlagBits2::eBottomOfPipe);
+
+  commandBuffers[currentFrame].end();
+}
 } // namespace Vulkan
