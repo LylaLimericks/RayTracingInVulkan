@@ -12,7 +12,6 @@
 #include <memory>
 #include <stdexcept>
 #include <vector>
-#include <vulkan/vulkan_core.h>
 
 #if defined(__INTELLISENSE__) || !defined(USE_CPP20_MODULES)
 #include <vulkan/vulkan_raii.hpp>
@@ -555,5 +554,43 @@ void Application::drawFrame() {
 
   semaphoreIndex = (semaphoreIndex + 1) % presentCompleteSemaphores.size();
   currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+std::vector<const char *> Application::getRequiredExtensions() {
+  uint32_t glfwExtensionCount = 0;
+  auto glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+  std::vector extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+
+  if (enableValidationLayers) {
+    extensions.push_back(vk::EXTDebugUtilsExtensionName);
+  }
+
+  return extensions;
+}
+
+[[nodiscard]] vk::raii::ShaderModule
+Application::createShaderModule(const std::vector<char> &code) const {
+  vk::ShaderModuleCreateInfo createInfo{
+      .codeSize = code.size() * sizeof(char),
+      .pCode = reinterpret_cast<const uint32_t *>(code.data()),
+  };
+  vk::raii::ShaderModule shaderModule{device, createInfo};
+
+  return shaderModule;
+}
+
+vk::Extent2D
+Application::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR &capabilities) {
+  if (capabilities.currentExtent.width != 0xFFFFFFFF) {
+    return capabilities.currentExtent;
+  }
+  int width, height;
+  glfwGetFramebufferSize(window, &width, &height);
+
+  return {std::clamp<uint32_t>(width, capabilities.minImageExtent.width,
+                               capabilities.maxImageExtent.width),
+          std::clamp<uint32_t>(height, capabilities.minImageExtent.height,
+                               capabilities.maxImageExtent.height)};
 }
 } // namespace Vulkan

@@ -4,26 +4,30 @@
 # See README.md for guidance.
 #---------------------------------------------------------------------------------------------------
 
-cmake_minimum_required ( VERSION 3.2.9...4.0.0 )
+cmake_minimum_required(VERSION 3.29)
 
-project ( VulkanRayTracing LANGUAGES CXX )
+project ( VulkanRayTracing VERSION 0.0.1 DESCRIPTION "Intro to Vulkan" LANGUAGES CXX )
 
 list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/CMake")
 
-find_package(Vulkan REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
-set(STB_INCLUDEDIR ${std_INCLUDE_DIRS})
+# set(STB_INCLUDEDIR ${std_INCLUDE_DIRS})
 
+find_package(Vulkan REQUIRED)
 add_library(VulkanCppModule INTERFACE)
 add_library(Vulkan::cppm ALIAS VulkanCppModule)
 target_link_libraries(VulkanCppModule INTERFACE Vulkan::Vulkan)
 
+target_compile_definitions(VulkanCppModule INTERFACE
+  VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
+  VULKAN_HPP_NO_STRUCT_CONSTRUCTORS=1
+)
 # Set to C++11
-set ( CMAKE_CXX_STANDARD          11 )
-set ( CMAKE_CXX_STANDARD_REQUIRED ON )
-set ( CMAKE_CXX_EXTENSIONS        OFF )
+# set ( CMAKE_CXX_STANDARD          11 )
+# set ( CMAKE_CXX_STANDARD_REQUIRED ON )
+# set ( CMAKE_CXX_EXTENSIONS        OFF )
 
 add_library(Application)
 
@@ -35,33 +39,40 @@ target_sources(Application
     FILE_SET applicationHeaders
     TYPE HEADERS
     BASE_DIRS
-      src
+      src/Vulkan
     FILES
       src/Vulkan/application.hpp
 )
 
+# target_link_libraries(Application
+#   PRIVATE
+#     Vulkan::cppm
+#     glfw
+#     # VulkanRT
+# )
+
 target_compile_features(Application PRIVATE cxx_std_20)
 target_compile_definitions(Application PRIVATE VULKAN_HPP_NO_STRUCT_CONSTRUCTORS)
 
-find_program(SLANGC_EXECUTABLE slangc HINTS $ENV{VULKAN_SDK}/bin REQUIRED)
-function (add_slang_shader_target TARGET)
-        cmake_parse_arguments("SHADER" "" "" "SOURCES" ${ARGN})
-        set(SHADERS_DIR shaders)
-        set (ENTRY_POINTS -entry vertMain -entry fragMain)
-        add_custom_command(
-                OUTPUT ${SHADERS_DIR}
-                COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADERS_DIR}
-        )
-        add_custom_command(
-                OUTPUT ${SHADERS_DIR}/slang.spv
-                COMMAND ${SLANGC_EXECUTABLE} ${SHADER_SOURCES} -target spirv -profile spirv_1_4 -emit-spirv-directly -fvk-use-entrypoint-name ${ENTRY_POINTS} -o slang.spv
-                WORKING_DIRECTORY ${SHADERS_DIR}
-                DEPENDS ${SHADERS_DIR} ${SHADER_SOURCES}
-                COMMENT "Compiling Slang Shaders..."
-                VERBATIM
-        )
-        add_custom_target(${TARGET} DEPENDS ${SHADERS_DIR}/slang.spv)
-endfunction()
+# find_program(SLANGC_EXECUTABLE slangc HINTS $ENV{VULKAN_SDK}/bin REQUIRED)
+# function (add_slang_shader_target TARGET)
+#         cmake_parse_arguments("SHADER" "" "" "SOURCES" ${ARGN})
+#         set(SHADERS_DIR shaders)
+#         set (ENTRY_POINTS -entry vertMain -entry fragMain)
+#         add_custom_command(
+#                 OUTPUT ${SHADERS_DIR}
+#                 COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADERS_DIR}
+#         )
+#         add_custom_command(
+#                 OUTPUT ${SHADERS_DIR}/slang.spv
+#                 COMMAND ${SLANGC_EXECUTABLE} ${SHADER_SOURCES} -target spirv -profile spirv_1_4 -emit-spirv-directly -fvk-use-entrypoint-name ${ENTRY_POINTS} -o slang.spv
+#                 WORKING_DIRECTORY ${SHADERS_DIR}
+#                 DEPENDS ${SHADERS_DIR} ${SHADER_SOURCES}
+#                 COMMENT "Compiling Slang Shaders..."
+#                 VERBATIM
+#         )
+#         add_custom_target(${TARGET} DEPENDS ${SHADERS_DIR}/slang.spv)
+# endfunction()
 
 # Source
 
@@ -133,28 +144,28 @@ include_directories(src)
 # you're new to CMake (like we are), the following may be a helpful example if you're using a
 # different compiler or want to set different compiler options.
 
-message (STATUS "Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
-message (STATUS "Release flags: " ${CMAKE_CXX_FLAGS_RELEASE})
-message (STATUS "Debug flags: " ${CMAKE_CXX_FLAGS_DEBUG})
+# message (STATUS "Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
+# message (STATUS "Release flags: " ${CMAKE_CXX_FLAGS_RELEASE})
+# message (STATUS "Debug flags: " ${CMAKE_CXX_FLAGS_DEBUG})
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    # /wd #### - Disable warning
-    # /we #### - treat warning as error
-    add_compile_options("/W4")      # Enable level-4 warnings
-    add_compile_options("/we 4265") # Class has virtual functions, but its non-trivial destructor is not virtual
-    add_compile_options("/we 5204") # Class has virtual functions, but its trivial destructor is not virtual
-    add_compile_options("/wd 4100") # unreferenced formal parameter
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    add_compile_options(-Wnon-virtual-dtor) # Class has virtual functions, but its destructor is not virtual
-    add_compile_options(-Wreorder) # Data member will be initialized after [other] data member
-    add_compile_options(-Wmaybe-uninitialized) # Variable improperly initialized
-    add_compile_options(-Wunused-variable) # Variable is defined but unused
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-Wnon-virtual-dtor) # Class has virtual functions, but its destructor is not virtual
-    add_compile_options(-Wreorder) # Data member will be initialized after [other] data member
-    add_compile_options(-Wsometimes-uninitialized) # Variable improperly initialized
-    add_compile_options(-Wunused-variable) # Variable is defined but unused
-endif()
+# if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+#     # /wd #### - Disable warning
+#     # /we #### - treat warning as error
+#     add_compile_options("/W4")      # Enable level-4 warnings
+#     add_compile_options("/we 4265") # Class has virtual functions, but its non-trivial destructor is not virtual
+#     add_compile_options("/we 5204") # Class has virtual functions, but its trivial destructor is not virtual
+#     add_compile_options("/wd 4100") # unreferenced formal parameter
+# elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+#     add_compile_options(-Wnon-virtual-dtor) # Class has virtual functions, but its destructor is not virtual
+#     add_compile_options(-Wreorder) # Data member will be initialized after [other] data member
+#     add_compile_options(-Wmaybe-uninitialized) # Variable improperly initialized
+#     add_compile_options(-Wunused-variable) # Variable is defined but unused
+# elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+#     add_compile_options(-Wnon-virtual-dtor) # Class has virtual functions, but its destructor is not virtual
+#     add_compile_options(-Wreorder) # Data member will be initialized after [other] data member
+#     add_compile_options(-Wsometimes-uninitialized) # Variable improperly initialized
+#     add_compile_options(-Wunused-variable) # Variable is defined but unused
+# endif()
 
 # Executables
 add_executable(inOneWeekend      ${EXTERNAL} ${SOURCE_ONE_WEEKEND})
@@ -165,6 +176,9 @@ target_link_libraries(inOneWeekend
     Application
     glfw
 )
+
+target_compile_features(inOneWeekend PRIVATE cxx_std_20)
+# target_compile_definitions(Application PRIVATE VULKAN_HPP_NO_STRUCT_CONSTRUCTORS)
 # add_executable(theNextWeek       ${EXTERNAL} ${SOURCE_NEXT_WEEK})
 # add_executable(theRestOfYourLife ${EXTERNAL} ${SOURCE_REST_OF_YOUR_LIFE})
 # add_executable(cos_cubed         src/TheRestOfYourLife/cos_cubed.cc         )

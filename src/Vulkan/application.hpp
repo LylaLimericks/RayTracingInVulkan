@@ -5,18 +5,19 @@
 #include <fstream>
 #include <iostream>
 #include <vulkan/vulkan_raii.hpp>
-#include <vulkan/vulkan_to_string.hpp>
 namespace Vulkan {
 
 class Application {
 public:
   // Application();
   void mainLoop();
+  Application(){};
+  ~Application(){};
 
 private:
   GLFWwindow *window = nullptr;
   vk::raii::Context context;
-  vk::raii::Instance instance;
+  vk::raii::Instance instance = nullptr;
   vk::raii::DebugUtilsMessengerEXT debugMessenger = nullptr;
   vk::raii::SurfaceKHR surface = nullptr;
   vk::raii::PhysicalDevice physicalDevice = nullptr;
@@ -78,7 +79,7 @@ private:
   void drawFrame();
 
   [[nodiscard]] vk::raii::ShaderModule
-  createShaderModule(const std::vector<char> &code);
+  createShaderModule(const std::vector<char> &code) const;
 
   void cleanUp();
 
