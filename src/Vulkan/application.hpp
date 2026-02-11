@@ -10,7 +10,7 @@ namespace Vulkan {
 class Application {
 public:
   // Application();
-  void mainLoop();
+  void run();
   Application(){};
   ~Application(){};
 
@@ -48,6 +48,7 @@ private:
       vk::KHRCreateRenderpass2ExtensionName,
   };
 
+  void mainLoop();
   void initWindow();
   void initVulkan();
 

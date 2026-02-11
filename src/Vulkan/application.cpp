@@ -37,6 +37,13 @@ constexpr bool enableValidationLayers = true;
 
 namespace Vulkan {
 
+void Application::run() {
+  initWindow();
+  initVulkan();
+  mainLoop();
+  cleanUp();
+}
+
 void Application::mainLoop() {
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
@@ -44,6 +51,15 @@ void Application::mainLoop() {
   }
 
   device.waitIdle();
+}
+
+void Application::initWindow() {
+  glfwInit();
+
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+  glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+  window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
 }
 
 void Application::initVulkan() {
@@ -592,5 +608,10 @@ Application::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR &capabilities) {
                                capabilities.maxImageExtent.width),
           std::clamp<uint32_t>(height, capabilities.minImageExtent.height,
                                capabilities.maxImageExtent.height)};
+}
+
+void Application::cleanUp() {
+  glfwDestroyWindow(window);
+  glfwTerminate();
 }
 } // namespace Vulkan
